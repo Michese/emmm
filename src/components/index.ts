@@ -8,4 +8,6 @@ export * from './emmmInput';
 export * from './emmmModal';
 export * from './emmmRadio';
 export * from './emmmUpload';
+export * from './emmmSaveFileModal';
+export * from './emmmErrorModal';
 export * from './enums';

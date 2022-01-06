@@ -3,7 +3,7 @@ import { routerNameEnum } from '@/router/enums';
 import Home from '@/views/home/Home.vue';
 import GeometricMethod from '@/views/geometricMethod/GeometricMethod.vue';
 import Simplex from '@/views/simplex/Simplex.vue';
-import MethodOfPotentials from '@/views/ methodOfPotentials/MethodOfPotentials.vue';
+import MethodOfPotentials from '@/views/methodOfPotentials/MethodOfPotentials.vue';
 import NetworkPlanning from '@/views/networkPlanning/NetworkPlanning.vue';
 import Instructions from '@/views/instructions/Instructions.vue';
 

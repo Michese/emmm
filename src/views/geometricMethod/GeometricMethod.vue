@@ -20,7 +20,7 @@
       <geometric-method-graphic v-if="pointVectorForGraphic" :is-current-step="true" class="geometric-method__geometric-method-graphic" />
       <answer v-if="answer" :is-current-step="true" :answer="answer" class="geometric-method__answer" />
       <footer v-if="true" class="geometric-method__footer">
-        <emmm-button>Сохранить</emmm-button>
+        <emmm-button @click="saveFile">Сохранить</emmm-button>
         <emmm-button :background="`orange`" @click="fullReset">Отчистить</emmm-button>
       </footer>
     </section>
@@ -42,6 +42,7 @@ import BuildingVector from '@/views/geometricMethod/buildingVector/BuildingVecto
 import Answer from '@/views/geometricMethod/answer/Answer.vue';
 import initialPointVectorForGraphic from '@/views/geometricMethod/initialPointVectorForGraphic';
 import initialAnswer from '@/views/geometricMethod/initialAnswer';
+import toBase64 from '@/helper/toBase64';
 
 @Options({
   name: 'GeometricMethod',
@@ -82,15 +83,18 @@ export default class GeometricMethod extends Vue {
     this.changeGeometricMethod();
   }
 
+  get geometricMethod(): tGeometricMethod {
+    return {
+      condition: this.condition!,
+      pointsForLines: this.pointsForLines,
+      pointsForVector: this.pointsForVector,
+      pointVectorForGraphic: this.pointVectorForGraphic,
+      answer: this.answer,
+    };
+  }
+
   changeGeometricMethod(): void {
-    const geometricMethod: tGeometricMethod = {
-        condition: this.condition!,
-        pointsForLines: this.pointsForLines,
-        pointsForVector: this.pointsForVector,
-        pointVectorForGraphic: this.pointVectorForGraphic,
-        answer: this.answer,
-      },
-      geometricMethodJSON = JSON.stringify(geometricMethod);
+    const geometricMethodJSON = JSON.stringify(this.geometricMethod);
     sessionStorage.setItem('geometricMethod', geometricMethodJSON);
   }
 
@@ -130,6 +134,19 @@ export default class GeometricMethod extends Vue {
       this.answer = answer;
     } else {
       this.fullReset();
+    }
+  }
+
+  async saveFile(): Promise<void> {
+    const geometricMethodJSON = JSON.stringify(this.geometricMethod),
+      file = new File([geometricMethodJSON], 'objectUrl.json', { type: 'application/json' });
+    const objectUrl = await toBase64(file);
+    if (objectUrl) {
+      const link = document.createElement('a');
+      link.setAttribute('href', objectUrl as string);
+      link.setAttribute('target', '_blank');
+      link.setAttribute('download', 'objectUrl.json');
+      link.click();
     }
   }
 }
