@@ -29,36 +29,28 @@ export default class EmmmUpload extends Vue {
     return 'application/json';
   }
 
-  fileReader = new FileReader();
-
   async uploadFile(target: HTMLInputElement): Promise<unknown> {
     const fileList: FileList | null = target.files;
     if (!fileList || !fileList[0]) return;
     const file = fileList[0];
-
     if (file.type === this.accept) {
-      this.fileReader.readAsText(file);
+      const json = await file.text();
+      console.log('obj', JSON.parse(json));
+      this.$emit('upload', JSON.parse(json));
     } else {
       console.error('Недопустимый формат файла!');
     }
     target.value = '';
-  }
-  created(): void {
-    this.fileReader.onload = (e: any): void => {
-      try {
-        const content = e.target.result,
-          intern = JSON.parse(content);
-        this.$emit('upload', intern);
-      } catch (err) {
-        console.error('Недопустимый формат файла!');
-      }
-    };
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .emmm-upload {
+  &__body {
+    display: none;
+  }
+
   &__inner {
     display: flex;
     flex-direction: column;
@@ -66,7 +58,7 @@ export default class EmmmUpload extends Vue {
     background-color: var(--light-green-color);
     border-radius: 10px;
     border: 1px dashed var(--blue-color);
-    padding: 75px 30px;
+    padding: 45px 30px;
     cursor: pointer;
   }
 

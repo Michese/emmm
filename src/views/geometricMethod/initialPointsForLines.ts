@@ -1,6 +1,6 @@
 import { tPointsForLine } from '@/views/geometricMethod/types';
 
-export default (function (): tPointsForLine[] {
+export default function (): tPointsForLine[] {
   return [
     {
       lines: [
@@ -21,4 +21,4 @@ export default (function (): tPointsForLine[] {
       ],
     },
   ];
-})();
+}

@@ -18,14 +18,18 @@
       />
       <building-vector v-if="pointsForVector" :is-current-step="true" :points-for-vector="pointsForVector" />
       <geometric-method-graphic v-if="pointVectorForGraphic" :is-current-step="true" class="geometric-method__geometric-method-graphic" />
-      <answer v-if="answer" :is-current-step="true" :answer="answer" />
+      <answer v-if="answer" :is-current-step="true" :answer="answer" class="geometric-method__answer" />
+      <footer v-if="true" class="geometric-method__footer">
+        <emmm-button>Сохранить</emmm-button>
+        <emmm-button :background="`orange`" @click="fullReset">Отчистить</emmm-button>
+      </footer>
     </section>
   </div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import { EmmmIcon } from '@/components';
+import { EmmmButton, EmmmIcon } from '@/components';
 import Initial from './initial/Initial.vue';
 import { tAnswer, tCondition, tGeometricMethod, tPointsForLine, tPointsForVector, tPointVectorForGraphic } from '@/views/geometricMethod/types';
 import BuildingStraightLines from '@/views/geometricMethod/buildingStraightLines/BuildingStraightLines.vue';
@@ -48,6 +52,7 @@ import initialAnswer from '@/views/geometricMethod/initialAnswer';
     BuildingStraightLines,
     GeometricMethodGraphic,
     Answer,
+    EmmmButton,
   },
 })
 export default class GeometricMethod extends Vue {
@@ -90,10 +95,10 @@ export default class GeometricMethod extends Vue {
   }
 
   initialApply(): void {
-    this.pointsForLines = initialPointsForLines;
-    this.pointsForVector = initialPointsForVector;
-    this.pointVectorForGraphic = initialPointVectorForGraphic;
-    this.answer = initialAnswer;
+    this.pointsForLines = initialPointsForLines();
+    this.pointsForVector = initialPointsForVector();
+    this.pointVectorForGraphic = initialPointVectorForGraphic();
+    this.answer = initialAnswer();
     console.log('initialApply');
   }
 
@@ -106,7 +111,7 @@ export default class GeometricMethod extends Vue {
   }
 
   fullReset(): void {
-    this.condition = initialCondition;
+    this.condition = initialCondition();
     if (this.pointsForLines) this.pointsForLines = null;
     if (this.pointsForVector) this.pointsForVector = null;
     if (this.pointVectorForGraphic) this.pointVectorForGraphic = null;
@@ -157,6 +162,20 @@ export default class GeometricMethod extends Vue {
 
   &__geometric-method-graphic {
     margin-bottom: 25px;
+  }
+
+  &__answer {
+    margin-bottom: 30px;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 30px;
+    position: sticky;
+    bottom: 0;
+    padding: 30px;
+    background-color: var(--white-color);
   }
 }
 

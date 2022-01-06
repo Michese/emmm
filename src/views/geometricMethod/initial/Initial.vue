@@ -14,7 +14,7 @@
       </a>
     </span>
 
-    <emmm-upload class="initial__emmm-upload" v-if="!isManually" @upload="$emit('upload', $event)" />
+    <emmm-upload class="initial__emmm-upload" v-if="!isManually && isCurrentStep" @upload="$emit('upload', $event)" />
 
     <ul class="initial__inequalities">
       <li class="initial__inequality">

@@ -1,6 +1,6 @@
 import { tCondition } from '@/views/geometricMethod/types';
 
-export default (function (): tCondition {
+export default function (): tCondition {
   return {
     Lmax: {
       x: null,
@@ -12,4 +12,4 @@ export default (function (): tCondition {
       { x: null, y: null, result: null },
     ],
   };
-})();
+}
