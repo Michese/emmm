@@ -1,20 +1,46 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Home from "../views/Home.vue";
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { routerNameEnum } from '@/router/enums';
+import Home from '@/views/home/Home.vue';
+import GeometricMethod from '@/views/geometricMethod/GeometricMethod.vue';
+import Simplex from '@/views/simplex/Simplex.vue';
+import MethodOfPotentials from '@/views/ methodOfPotentials/MethodOfPotentials.vue';
+import NetworkPlanning from '@/views/networkPlanning/NetworkPlanning.vue';
+import Instructions from '@/views/instructions/Instructions.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
-    name: "Home",
+    path: '/',
+    redirect: to => ({ name: routerNameEnum.Home }),
+  },
+  {
+    path: '/home',
+    name: routerNameEnum.Home,
     component: Home,
   },
   {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+    path: '/geometric-method',
+    name: routerNameEnum.GeometricMethod,
+    component: GeometricMethod,
+  },
+  {
+    path: '/simplex',
+    name: routerNameEnum.Simplex,
+    component: Simplex,
+  },
+  {
+    path: '/method-of-potentials',
+    name: routerNameEnum.MethodOfPotentials,
+    component: MethodOfPotentials,
+  },
+  {
+    path: '/network-planning',
+    name: routerNameEnum.NetworkPlanning,
+    component: NetworkPlanning,
+  },
+  {
+    path: '/instructions',
+    name: routerNameEnum.Instructions,
+    component: Instructions,
   },
 ];
 
@@ -23,4 +49,5 @@ const router = createRouter({
   routes,
 });
 
+export * from './enums';
 export default router;
