@@ -14,6 +14,7 @@
           :currentValue="answer.radio"
           @input="onChangeRadio($event.target.value)"
           :value="radioValue.value"
+          :disabled="!isCurrentStep"
           :id="radioValue.value"
           name="answer"
           :label="radioValue.title"
@@ -99,7 +100,7 @@ export default class Answer extends Vue {
     switch (this.answer.radio) {
       case radioAnswerEnum.point:
       case radioAnswerEnum.line:
-        return !!this.answer.Lmax && this.answer.points.every(point => point.x && point.y);
+        return this.answer.Lmax !== null && this.answer.points.every(point => point.x !== null && point.y !== null);
       case radioAnswerEnum.noSolution:
         return true;
       default:
@@ -209,6 +210,11 @@ export default class Answer extends Vue {
 
   &__icon {
     fill: var(--dark-blue-color);
+    transition: transform linear 0.05s;
+
+    &:hover {
+      transform: scale3d(1.2, 1.2, 1.2);
+    }
   }
 }
 

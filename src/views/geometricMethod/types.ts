@@ -6,6 +6,8 @@ type tGeometricMethod = {
   pointsForVector: tPointsForVector | null;
   pointVectorForGraphic: tPointVectorForGraphic | null;
   answer: tAnswer | null;
+  countErrors: number;
+  showResult: boolean;
 };
 
 type tCondition = {

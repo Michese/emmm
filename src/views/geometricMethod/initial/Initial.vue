@@ -9,7 +9,7 @@
 
     <span class="initial__task-top">
       <span class="initial__title">Условие</span>
-      <a href="#" target="_blank" download class="initial__question question">
+      <a href="#" target="_blank" download class="initial__question question" tabindex="-1">
         <emmm-icon class="question__icon" icon="question" :size="40" />
       </a>
     </span>
@@ -102,7 +102,7 @@ export default class Initial extends Vue {
   })
   condition!: tCondition;
 
-  isManually = false;
+  isManually = true;
 
   get manuallyButtonBgc(): string {
     return this.isManually ? colorEnum.blue : colorEnum.lightGreen;
@@ -194,6 +194,11 @@ export default class Initial extends Vue {
 
   &__icon {
     fill: var(--dark-blue-color);
+    transition: transform linear 0.05s;
+
+    &:hover {
+      transform: scale3d(1.2, 1.2, 1.2);
+    }
   }
 }
 </style>

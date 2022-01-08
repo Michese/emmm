@@ -4,7 +4,7 @@
   <div class="app">
     <page-menu class="app__menu"></page-menu>
     <main class="app__main">
-      <router-view />
+      <component :is="menuItems[activePage].to" />
     </main>
   </div>
 </template>
@@ -13,7 +13,10 @@
 import { Options, Vue } from 'vue-class-component';
 import PageMenu from '@/views/layout/pageMenu/PageMenu.vue';
 import { EmmmErrorModal, EmmmSprite } from '@/components';
-import { Provide } from 'vue-property-decorator';
+import { ProvideReactive, Watch } from 'vue-property-decorator';
+import { tMenuItems } from '@/types';
+import { routerNameEnum } from '@/enums';
+import initialMenuItems from '@/initialMenuItems';
 
 @Options({
   name: 'App',
@@ -28,13 +31,30 @@ export default class App extends Vue {
     errorModal: { showModal: (message: string) => void };
   };
 
-  @Provide()
+  @ProvideReactive('activePage') activePage: string = routerNameEnum.Home;
+
+  @Watch('activePage', { deep: true }) wActivePage(): void {
+    sessionStorage.setItem('activePage', this.activePage);
+  }
+
+  @ProvideReactive('menuItems')
+  get menuItems(): tMenuItems {
+    return initialMenuItems;
+  }
+
+  @ProvideReactive('changePage')
+  changePage(component: string): void {
+    this.activePage = component;
+  }
+
+  @ProvideReactive('openErrorModal')
   openErrorModal(message: string): void {
     this.$refs.errorModal.showModal(message);
   }
 
-  mounted(): void {
-    this.openErrorModal('Привет, мир!');
+  created(): void {
+    const activePage = sessionStorage.getItem('activePage');
+    if (activePage) this.activePage = activePage;
   }
 }
 </script>
@@ -46,7 +66,6 @@ export default class App extends Vue {
 
   &__main {
     flex: 1 1;
-    padding: 15px;
   }
 }
 </style>

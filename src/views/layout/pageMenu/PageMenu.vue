@@ -2,8 +2,8 @@
   <section class="page-menu page-menu_active">
     <nav class="page-menu__nav nav">
       <ul class="nav__list">
-        <li v-for="item in menuItems" :key="item.title" class="nav__item">
-          <router-link :to="item.to" class="nav__link" active-class="nav__link_active"> {{ item.title }} </router-link>
+        <li v-for="item in menuList" :key="item.key" class="nav__item">
+          <button type="button" class="nav__link" :class="item.isActive" @click="changePage(item.key)"> {{ item.title }} </button>
         </li>
       </ul>
     </nav>
@@ -12,28 +12,21 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import { RouteLocationRaw } from 'vue-router';
-import { routerNameEnum } from '@/router';
-
-type tMenuItem = {
-  title: string;
-  to: RouteLocationRaw;
-};
+import { InjectReactive } from 'vue-property-decorator';
+import { Component } from 'vue';
+import { tMenuItem, tMenuItems } from '@/types';
 
 @Options({
   name: 'PageMenu',
 })
 export default class PageMenu extends Vue {
-  get menuItems(): tMenuItem[] {
-    return [
-      { title: 'Главная', to: { name: routerNameEnum.Home } },
-      { title: 'Геометрический метод', to: { name: routerNameEnum.GeometricMethod } },
-      { title: 'Симплекс-метод', to: { name: routerNameEnum.Simplex } },
-      { title: 'Метод потенциалов', to: { name: routerNameEnum.MethodOfPotentials } },
-      { title: 'Сетевое планирование', to: { name: routerNameEnum.NetworkPlanning } },
-      { title: 'Инструкции', to: { name: routerNameEnum.Instructions } },
-    ];
+  get menuList(): any {
+    return [...this.menuItems].map(item => ({ ...item, isActive: { active: item.key === this.activePage } }));
   }
+
+  @InjectReactive() menuItems!: any;
+  @InjectReactive() changePage!: (component: Component) => void;
+  @InjectReactive() activePage!: Component;
 }
 </script>
 
@@ -60,8 +53,11 @@ export default class PageMenu extends Vue {
     display: flex;
     width: 100%;
     padding: 10px 22px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
 
-    &_active {
+    &.active {
       background-color: var(--blue-color);
     }
   }

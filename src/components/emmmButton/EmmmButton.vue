@@ -41,6 +41,11 @@ export default class EmmmButton extends Vue {
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
 
+  &:hover:not(&:disabled) {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+    opacity: 0.9;
+  }
+
   &:active {
     box-shadow: inset 0 4px 4px rgba(0, 0, 0, 0.25);
   }

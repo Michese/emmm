@@ -43,9 +43,10 @@ export default class EmmmNumberInput extends Vue {
   padding: 20px 15px;
   width: 100%;
   text-align: center;
-  border: 1px solid var(--black-color);
+  outline: none;
+  border: none;
   border-radius: 10px;
-  background-color: var(--gray-color);
+  background-color: var(--turquoise-color);
   box-shadow: inset 0 4px 4px rgba(0, 0, 0, 0.25);
   &::placeholder {
     color: var(--dark-gray-color);
@@ -53,8 +54,11 @@ export default class EmmmNumberInput extends Vue {
   }
 
   &:focus {
-    border: 1px solid var(--blue-color);
-    outline: 2px solid var(--blue-color);
+    outline: 2px solid var(--green-color);
+  }
+
+  &:disabled {
+    background-color: var(--gray-color);
   }
 }
 </style>

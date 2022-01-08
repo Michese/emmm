@@ -69,6 +69,19 @@ class TLine extends TFigure {
     } else if (secondLine.a1 === firstLine.a1) {
       return null;
     } else {
+      if (
+        firstLine.firstPoint.x == Infinity ||
+        firstLine.secondPoint.x == Infinity ||
+        firstLine.firstPoint.y == Infinity ||
+        firstLine.secondPoint.y == Infinity ||
+        secondLine.firstPoint.x == Infinity ||
+        secondLine.secondPoint.x == Infinity ||
+        secondLine.firstPoint.y == Infinity ||
+        secondLine.secondPoint.y == Infinity
+      ) {
+        const x = (firstLine.a0 - secondLine.a0) / (secondLine.a1 - firstLine.a1);
+        // console.log(new TPoint(x, firstLine.resultFunction(x)));
+      }
       const x = (firstLine.a0 - secondLine.a0) / (secondLine.a1 - firstLine.a1);
       return new TPoint(x, firstLine.resultFunction(x));
     }

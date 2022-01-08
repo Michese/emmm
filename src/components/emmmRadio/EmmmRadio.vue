@@ -1,7 +1,10 @@
 <template>
   <span class="emmm-radio">
-    <input type="radio" :name="name" :id="id" :value="value" v-model="curValue" class="emmm-radio__body" />
-    <label :for="id">{{ label }}</label>
+    <label :for="id" class="emmm-radio__label">
+      <input type="radio" :name="name" :id="id" :value="value" v-model="curValue" :disabled="disabled" class="emmm-radio__body" />
+      <span class="emmm-radio__circle" />
+      {{ label }}
+    </label>
   </span>
 </template>
 
@@ -45,6 +48,13 @@ export default class EmmmRadio extends Vue {
   })
   currentValue!: string;
 
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: () => false,
+  })
+  disabled!: boolean;
+
   @Watch('currentValue') wCurrentValue(): void {
     this.curValue = this.currentValue;
   }
@@ -58,8 +68,34 @@ export default class EmmmRadio extends Vue {
   display: flex;
   align-items: center;
 
-  &__body {
+  &__circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin-right: 0.5em;
+    height: 0.6em;
+    width: 0.6em;
+    outline: 5px solid var(--light-green-color);
+    border: 2px solid var(--white-color);
+    border-radius: 50%;
+  }
+
+  &__body {
+    display: none;
+  }
+
+  &__body:checked + &__circle {
+    background-color: var(--blue-color);
+  }
+
+  &__body:disabled + &__circle {
+    outline: 5px solid var(--gray-color);
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
   }
 }
 </style>

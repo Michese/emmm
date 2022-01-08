@@ -4,6 +4,8 @@ enum iconNames {
   download = 'download',
   cross = 'cross',
   question = 'question',
+  save = 'save',
+  success = 'success',
 }
 
 export { iconNames };

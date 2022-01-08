@@ -15,16 +15,22 @@
         class="geometric-method-graphic__emmm-graphic"
       >
         <emmm-zone :points="zonePoints" />
-        <emmm-line v-for="line in lines" :key="line" :line="line" :is-corrugated="false" />
-        <emmm-normal-vector :vector="normalVector.vector" :point="normalVector.point" @set-point="setVectorPoint" />
+        <emmm-line v-for="line in lines" :key="line" :line="line" :is-corrugated="true" />
+        <emmm-normal-vector :vector="normalVector.vector" :point="normalVector.point" :canMove="isCurrentStep" @set-point="setVectorPoint" />
       </emmm-graphic>
     </div>
+
+    <footer v-if="isCurrentStep" class="geometric-method-graphic__footer">
+      <emmm-button @click="$emit('back')" class="geometric-method-graphic__back-btn">Назад</emmm-button>
+      <emmm-button @click="$emit('apply')" class="geometric-method-graphic__apply-btn">Далее</emmm-button>
+    </footer>
   </section>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import {
+  EmmmButton,
   EmmmGraphic,
   EmmmIcon,
   EmmmLine,
@@ -36,12 +42,8 @@ import {
   TPoint,
   TStaticZoneBuilder,
 } from '@/components';
-import { Prop } from 'vue-property-decorator';
-
-const startX = -5,
-  endX = 25,
-  startY = -5,
-  endY = 25;
+import { InjectReactive, Prop } from 'vue-property-decorator';
+import { tCondition, tPointVectorForGraphic } from '@/views/geometricMethod/types';
 
 @Options({
   name: 'GeometricMethodGraphic',
@@ -52,7 +54,9 @@ const startX = -5,
     EmmmNormalVector,
     EmmmLine,
     EmmmIcon,
+    EmmmButton,
   },
+  emits: ['apply', 'back'],
 })
 export default class GeometricMethodGraphic extends Vue {
   @Prop({
@@ -62,30 +66,46 @@ export default class GeometricMethodGraphic extends Vue {
   })
   isCurrentStep!: boolean;
 
-  graphicBuilder = new GraphicBuilder().setRangeX(startX, endX).setRangeY(startY, endY);
-  point: TPoint = new TPoint(0, 5);
-  lines: TLine[] = [
-    TLine.createLineByPoints(startX, 0, endX, 0, true),
-    TLine.createLineByPoints(0, startY, 0, endY, true),
-    TLine.createLineByEquation(1, 3, startX, endX, false),
-    TLine.createLineByEquation(4, 0, startX, endX, false),
-    TLine.createLineByEquation(9, -2, startX, endX, false),
-  ];
+  @Prop({
+    type: Object,
+    required: true,
+  })
+  pointVectorForGraphic!: tPointVectorForGraphic;
+
+  @Prop({
+    type: Object,
+    required: true,
+  })
+  condition!: tCondition;
+
+  graphicBuilder = new GraphicBuilder().setRangeX(this.startX, this.endX).setRangeY(this.startY, this.endY);
+  // point: TPoint = new TPoint(0, 5);
+
+  get lines(): TLine[] {
+    return [
+      TLine.createLineByPoints(this.startX, 0, this.endX, 0, true),
+      TLine.createLineByPoints(0, this.startY, 0, this.endY, true),
+      ...this.condition.inequalities.map(inequality =>
+        TLine.createLineByEquation(inequality.result! / inequality.y!, -inequality.x! / inequality.y!, this.startX, this.endX, false),
+      ),
+    ];
+  }
+
   normalVector: {
     vector: TPoint;
     point: TPoint;
   } = {
-    vector: new TPoint(2, 1),
-    point: new TPoint(0, 0),
+    vector: new TPoint(this.condition.Lmax.x!, this.condition.Lmax.y!),
+    point: new TPoint(this.pointVectorForGraphic.x!, this.pointVectorForGraphic.y!),
   };
 
   get allLines(): TLine[] {
     return [
       ...this.lines,
-      TLine.createLineByPoints(startX, startY, startX, endY, true),
-      TLine.createLineByEquation(startY, 0, startX, endX, true),
-      TLine.createLineByEquation(endY, 0, startX, endX, false),
-      TLine.createLineByPoints(endX, startY, endX, endY, false),
+      TLine.createLineByPoints(this.startX, this.startY, this.startX, this.endY, true),
+      TLine.createLineByEquation(this.startY, 0, this.startX, this.endX, true),
+      TLine.createLineByEquation(this.endY, 0, this.startX, this.endX, false),
+      TLine.createLineByPoints(this.endX, this.startY, this.endX, this.endY, false),
     ];
   }
 
@@ -108,7 +128,43 @@ export default class GeometricMethodGraphic extends Vue {
     return this.lines.filter(line => line.a1 === a1);
   }
 
-  zonePoints: TPoint[] = TStaticZoneBuilder.pointsAxis(this.allLines, startX, endX, startY, endY);
+  get pointsOfArea(): TPoint[] {
+    return TStaticZoneBuilder.pointsOfArea(this.condition.inequalities);
+  }
+
+  get minX(): number {
+    return Math.min(...this.pointsOfArea.map(point => point.x), 0);
+  }
+
+  get minY(): number {
+    return Math.min(...this.pointsOfArea.map(point => point.y), 0);
+  }
+
+  get startX(): number {
+    return Math.min(this.minX, this.minY) - 5;
+  }
+
+  get startY(): number {
+    return Math.min(this.minX, this.minY) - 5;
+  }
+
+  get maxX(): number {
+    return Math.max(...this.pointsOfArea.map(point => point.x), 5);
+  }
+
+  get maxY(): number {
+    return Math.max(...this.pointsOfArea.map(point => point.y), 5);
+  }
+
+  get endX(): number {
+    return Math.max(this.maxX, this.maxY) + 5;
+  }
+
+  get endY(): number {
+    return Math.max(this.maxX, this.maxY) + 5;
+  }
+
+  zonePoints: TPoint[] = TStaticZoneBuilder.pointsAxis(this.allLines, this.startX, this.endX, this.startY, this.endY);
 
   setVectorPoint(movePoint: TPoint): void {
     let minDistance = 1,
@@ -123,7 +179,15 @@ export default class GeometricMethodGraphic extends Vue {
     });
     nearestPoint = nearestPoint ?? movePoint;
     this.normalVector.point = nearestPoint;
+    this.pointVectorForGraphic.x = nearestPoint.x;
+    this.pointVectorForGraphic.y = nearestPoint.y;
   }
+
+  get maxValue(): number {
+    return Math.max(...this.pointsOfArea.map(point => point.x * this.condition.Lmax.x! + point.y * this.condition.Lmax.y!));
+  }
+
+  @InjectReactive('openErrorModal') openErrorModal?: (message: string) => void;
 }
 </script>
 
@@ -142,6 +206,16 @@ export default class GeometricMethodGraphic extends Vue {
   &__inner {
     display: flex;
     justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__back-btn {
+    margin-right: 20px;
   }
 }
 
@@ -151,6 +225,11 @@ export default class GeometricMethodGraphic extends Vue {
 
   &__icon {
     fill: var(--dark-blue-color);
+    transition: transform linear 0.05s;
+
+    &:hover {
+      transform: scale3d(1.2, 1.2, 1.2);
+    }
   }
 }
 </style>

@@ -2,6 +2,7 @@ enum colorEnum {
   black = 'black',
   lightGreen = 'light-green',
   green = 'green',
+  success = 'success',
   darkBlue = 'dark-blue',
   lightBlue = 'light-blue',
   blue = 'blue',
@@ -9,6 +10,7 @@ enum colorEnum {
   gray = 'gray',
   yellow = 'yellow',
   orange = 'orange',
+  turquoise = 'turquoise',
 }
 
 export { colorEnum };

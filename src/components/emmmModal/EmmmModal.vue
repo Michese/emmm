@@ -57,7 +57,6 @@ export default class EmmmModal extends Vue {
 
   @Provide()
   showModal(): void {
-    console.log('show');
     this.isShow = true;
   }
 
@@ -80,7 +79,6 @@ export default class EmmmModal extends Vue {
   justify-content: center;
   align-content: center;
   align-items: center;
-  border-radius: 20px;
   background-color: rgba(0, 0, 0, 0.6);
 
   &__inner {

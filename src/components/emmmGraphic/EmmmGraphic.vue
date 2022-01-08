@@ -20,8 +20,8 @@
         <polyline :points="framePolyline" fill="none" stroke="gray" stroke-width="0.1" />
         <polyline :points="gridPolyline" fill="none" stroke="gray" stroke-width="0.1" stroke-dasharray="0.2" />
         <polyline v-if="showAxiosX || showAxiosY" :points="axisPolyline" fill="black" stroke="black" stroke-width="0.4" />
-        <text v-if="showAxiosY" :x="axisMarkY.x" :y="axisMarkY.y" :style="axiosMarkStyles">y</text>
-        <text v-if="showAxiosX" :x="axisMarkX.x" :y="axisMarkX.y" :style="axiosMarkStyles">x</text>
+        <text v-if="showAxiosY" :x="axisMarkY.x" :y="axisMarkY.y" class="static-graphic__axis-mark">y</text>
+        <text v-if="showAxiosX" :x="axisMarkX.x" :y="axisMarkX.y" class="static-graphic__axis-mark">x</text>
         <slot></slot>
       </svg>
     </div>
@@ -183,11 +183,10 @@ export default class EmmmGraphic extends Vue {
 
   // Grid
   get gridPolyline(): string {
-    const { sizeCellPx, sizeCellUnit, startXUnit, startYUnit } = this.graphicBuilder;
+    const { sizeCellPx, sizeCellUnit, startXUnit, endYUnit } = this.graphicBuilder;
     let polyline = `0, 0 0, ${this.heightPx} ${this.widthPx}, ${this.heightPx} ${this.widthPx}, 0`,
       isEnd = true;
-
-    for (let row = (startYUnit % sizeCellUnit) * sizeCellPx; row < this.heightPx; isEnd = !isEnd, row += sizeCellPx) {
+    for (let row = ((endYUnit % sizeCellUnit) * sizeCellPx) / sizeCellUnit; row < this.heightPx; isEnd = !isEnd, row += sizeCellPx) {
       polyline += ` ${isEnd ? this.widthPx : 0}, ${row} ${isEnd ? 0 : this.widthPx}, ${row}`;
     }
     if (isEnd) polyline += ` ${this.widthPx}, ${this.heightPx}`;
@@ -216,19 +215,12 @@ export default class EmmmGraphic extends Vue {
   }
 
   get axisMarkY(): { x: number; y: number } {
-    return { x: this.startPoint.x - 3, y: 2 };
-  }
-
-  get axiosMarkStyles(): Record<string, unknown> {
-    const { sizeCellPx } = this.graphicBuilder;
-    return {
-      fontSize: `${sizeCellPx / 3}px`,
-    };
+    return { x: this.startPoint.x - 4, y: 2 };
   }
 
   get axisPolyline(): string {
-    const arrowWidth = 2,
-      arrowHeight = 3;
+    const arrowWidth = this.svgWidth / (this.showEndX * 10),
+      arrowHeight = this.svgHeight / (this.showEndY * 10);
     let polyline = '';
     if (this.showAxiosY) {
       polyline += `${this.startPoint.x}, ${this.heightPx} ${this.startPoint.x}, 0 ${this.startPoint.x - arrowWidth}, ${arrowHeight} ${
@@ -260,6 +252,10 @@ export default class EmmmGraphic extends Vue {
 
   &__body {
     background-color: var(--light-green-color);
+  }
+
+  &__axis-mark {
+    font-size: 0.1em;
   }
 }
 

@@ -1,11 +1,11 @@
 <template>
   <defs>
     <marker id="black-arrow" viewBox="0 0 6 6" refX="4" refY="3" orient="auto">
-      <path d="M 0 0 L 6 3 L 0 6 z" fill="var(--orange-color)" />
+      <path d="M 0 0 L 6 3 L 0 6 z" :style="vectorMarkerStyles" />
     </marker>
   </defs>
   <g @mousedown.stop.prevent="onMouseDown">
-    <polyline :points="points" stroke="var(--orange-color)" stroke-width="0.4" marker-end="url(#black-arrow)" />
+    <polyline :points="points" :style="vectorStyles" stroke-width="0.4" marker-end="url(#black-arrow)" />
     <polyline :points="backgroundPoints" fill="transparent" stroke-width="2" />
   </g>
 </template>
@@ -38,9 +38,24 @@ export default class EmmmNormalVector extends Vue {
   })
   point!: TPoint;
 
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: () => true,
+  })
+  canMove!: boolean;
+
   get pointPx(): { x: number; y: number } {
     const { ratioSizeCell } = this.graphicBuilder;
     return { x: this.startPoint.x + this.point.x * ratioSizeCell, y: this.startPoint.y - this.point.y * ratioSizeCell };
+  }
+
+  get vectorStyles(): { stroke: string } {
+    return { stroke: this.canMove ? 'var(--orange-color)' : 'var(--orange-color)' };
+  }
+
+  get vectorMarkerStyles(): { fill: string } {
+    return { fill: this.canMove ? 'var(--orange-color)' : 'var(--orange-color)' };
   }
 
   currentPoint: { x: number; y: number } = { x: 0, y: 0 };
@@ -92,7 +107,7 @@ export default class EmmmNormalVector extends Vue {
   }
 
   onMouseDown({ offsetX: x, offsetY: y }: MouseEvent): void {
-    this.movePoint = { x: x, y };
+    if (this.canMove) this.movePoint = { x: x, y };
   }
 
   onMouseMove({ offsetX, offsetY }: MouseEvent): void {
