@@ -7,7 +7,7 @@ function replaceFractionObject(
   { top: newTop, bottom: newBottom }: TPreparedFraction,
 ): TPreparedFraction {
   return {
-    top: newTop ?? oldTop,
+    top: newTop && !isNaN(newTop) ? newTop : oldTop,
     bottom: newBottom || oldBottom,
   };
 }
@@ -24,8 +24,10 @@ const memoPrepareNumber: (number: string) => TPreparedFraction = memoize((number
   let resultFraction = { top: Fraction.DEFAULT_TOP, bottom: Fraction.DEFAULT_BOTTOM };
   const splittedFraction = Fraction.splitDivisions(number);
   resultFraction = replaceFractionObject(resultFraction, splittedFraction);
-  const parsedFraction = Fraction.parseToFraction(resultFraction.top / resultFraction.bottom);
-  resultFraction = replaceFractionObject(resultFraction, parsedFraction);
+  if (!Number.isInteger(resultFraction.top) || !Number.isInteger(resultFraction.bottom)) {
+    const parsedFraction = Fraction.parseToFraction(resultFraction.top / resultFraction.bottom);
+    resultFraction = replaceFractionObject(resultFraction, parsedFraction);
+  }
   const slashedFraction = Fraction.slash(resultFraction.top, resultFraction.bottom);
   return replaceFractionObject(resultFraction, slashedFraction);
 });
@@ -51,7 +53,7 @@ const memoSplitDivisions: (numbers: string) => TPreparedFraction = memoize(numbe
 });
 
 const memoSlash: (top: number, bottom: number) => TPreparedFraction = memoize((top, bottom) => {
-  const gcdResult = Fraction.gcd(top, bottom);
+  const gcdResult = Fraction.gcd(Math.abs(top), bottom);
   return {
     top: top / gcdResult,
     bottom: bottom / gcdResult,

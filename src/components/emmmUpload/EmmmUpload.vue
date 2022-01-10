@@ -46,7 +46,7 @@ export default class EmmmUpload extends Vue {
   async uploadFile(target: HTMLInputElement): Promise<void> {
     const fileList: FileList | null = target.files;
     if (!fileList || !fileList[0]) return;
-
+    await this.loadFile(fileList);
     target.value = '';
   }
 

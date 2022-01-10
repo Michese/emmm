@@ -67,6 +67,12 @@ class Fraction {
   multiplication(fraction: TPreparedFraction): Fraction {
     this.top = this.top * fraction.top;
     this.bottom = this.bottom * fraction.bottom;
+
+    if (this.bottom < 0) {
+      this.bottom = Math.abs(this.bottom);
+      this.top *= -1;
+    }
+
     this.slash();
     return this;
   }
@@ -76,6 +82,11 @@ class Fraction {
     top *= secondFraction.top;
     bottom *= secondFraction.bottom;
 
+    if (bottom < 0) {
+      bottom = Math.abs(bottom);
+      top *= -1;
+    }
+
     const { top: slashedTop, bottom: slashedBottom } = this.slash(top, bottom);
     return new Fraction({ top: slashedTop, bottom: slashedBottom });
   }
@@ -83,6 +94,10 @@ class Fraction {
   division(fraction: TPreparedFraction): Fraction {
     this.top = this.top * fraction.bottom;
     this.bottom = this.bottom * fraction.top;
+    if (this.bottom < 0) {
+      this.bottom = Math.abs(this.bottom);
+      this.top *= -1;
+    }
     this.slash();
     return this;
   }
@@ -91,6 +106,11 @@ class Fraction {
     let { top, bottom } = firstFraction;
     top *= secondFraction.bottom;
     bottom *= secondFraction.top;
+
+    if (bottom < 0) {
+      bottom = Math.abs(bottom);
+      top *= -1;
+    }
 
     const { top: slashedTop, bottom: slashedBottom } = this.slash(top, bottom);
     return new Fraction({ top: slashedTop, bottom: slashedBottom });

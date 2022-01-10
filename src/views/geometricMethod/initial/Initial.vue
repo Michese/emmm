@@ -67,7 +67,7 @@
       </li>
     </ul>
     <div v-if="isCurrentStep" class="initial__apply-btn">
-      <emmm-button @click="applyBtnClick" :disabled="!checkCondition()">Далее</emmm-button>
+      <emmm-button @click="applyBtnClick" :disabled="!checkCondition">Далее</emmm-button>
     </div>
   </section>
 </template>
@@ -112,7 +112,7 @@ export default class Initial extends Vue {
     return this.isManually ? colorEnum.lightGreen : colorEnum.blue;
   }
 
-  checkCondition(): boolean {
+  get checkCondition(): boolean {
     return (
       this.condition.Lmax.x !== null &&
       this.condition.Lmax.y !== null &&
@@ -129,7 +129,7 @@ export default class Initial extends Vue {
   }
 
   applyBtnClick(): void {
-    if (this.checkCondition()) this.apply();
+    if (this.checkCondition) this.apply();
   }
 
   @Emit('apply') apply(): void {

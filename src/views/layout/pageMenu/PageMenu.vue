@@ -15,18 +15,19 @@ import { Options, Vue } from 'vue-class-component';
 import { InjectReactive } from 'vue-property-decorator';
 import { Component } from 'vue';
 import { tMenuItem, tMenuItems } from '@/types';
+import { routerNameEnum } from '@/enums';
 
 @Options({
   name: 'PageMenu',
 })
 export default class PageMenu extends Vue {
-  get menuList(): any {
+  get menuList(): tMenuItem[] {
     return [...this.menuItems].map(item => ({ ...item, isActive: { active: item.key === this.activePage } }));
   }
 
-  @InjectReactive() menuItems!: any;
+  @InjectReactive() menuItems!: tMenuItems;
   @InjectReactive() changePage!: (component: Component) => void;
-  @InjectReactive() activePage!: Component;
+  @InjectReactive() activePage!: routerNameEnum;
 }
 </script>
 

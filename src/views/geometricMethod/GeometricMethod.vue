@@ -59,7 +59,7 @@
       <emmm-save-file-modal ref="saveFileModal" />
     </section>
   </div>
-  <a href="#footer" ref="linkFooter" />
+  <a href="#footer" ref="linkFooter" tabindex="-1" />
   <footer v-if="true" class="geometric-method__footer" id="footer">
     <emmm-button :background="'blue'" @click="saveFile">Сохранить</emmm-button>
     <emmm-button :background="`orange`" @click="fullReset">Очистить</emmm-button>
@@ -345,8 +345,8 @@ export default class GeometricMethod extends Vue {
   }
 
   fullReset(): void {
-    this.geometricMethod = initialGeometricMethod();
     if (sessionStorage.getItem('geometricMethod')) sessionStorage.removeItem('geometricMethod');
+    this.geometricMethod = initialGeometricMethod();
   }
 
   toDown(): void {
