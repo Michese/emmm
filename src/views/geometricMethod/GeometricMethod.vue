@@ -68,7 +68,7 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import { EmmmButton, EmmmIcon, EmmmResultSection, EmmmSaveFileModal, TLine, TPoint } from '@/components';
+import { EmmmButton, EmmmIcon, EmmmResultSection, EmmmSaveFileModal, TLine, TPoint, TStaticZoneBuilder } from '@/components';
 import Initial from './initial/Initial.vue';
 import { tGeometricMethod } from '@/views/geometricMethod/types';
 import BuildingStraightLines from '@/views/geometricMethod/buildingStraightLines/BuildingStraightLines.vue';
@@ -216,11 +216,16 @@ export default class GeometricMethod extends Vue {
         pointVectorForGraphic,
         condition: { Lmax },
       } = this.geometricMethod!,
-      { maxValue, endX, allLines } = this.$refs.graphic;
+      { maxValue, allLines, pointsOfArea } = this.$refs.graphic;
 
-    const currentValue = pointVectorForGraphic!.x * Lmax.x! + pointVectorForGraphic!.y * Lmax.y!,
-      axisPoint = new TPoint(endX, 0);
-    if (Math.abs(currentValue - maxValue) <= 0.001 || allLines.every(line => line.checkPoint(axisPoint))) {
+    const currentValue = pointVectorForGraphic!.x * Lmax.x! + pointVectorForGraphic!.y * Lmax.y!;
+    if (
+      Math.abs(currentValue - maxValue) <= 0.001 ||
+      pointsOfArea.length === 0 ||
+      TStaticZoneBuilder.pointsOfIntersection(allLines).some(
+        point => allLines.every(line => line.checkPoint(point)) && maxValue < point.x * Lmax.x! + point.y * Lmax.y!,
+      )
+    ) {
       this.geometricMethod!.answer = initialAnswer();
       this.toDown();
     } else {
@@ -238,10 +243,17 @@ export default class GeometricMethod extends Vue {
     let errorMessage = '';
 
     if (this.geometricMethod!.answer!.radio !== radioAnswerEnum.noSolution) {
-      const { endX, allLines } = this.$refs.graphic,
-        axisPoint = new TPoint(endX, 0);
+      const {
+          condition: { Lmax },
+        } = this.geometricMethod!,
+        { allLines, pointsOfArea, maxValue } = this.$refs.graphic;
 
-      if (allLines.every(line => line.checkPoint(axisPoint))) {
+      if (
+        pointsOfArea.length === 0 ||
+        TStaticZoneBuilder.pointsOfIntersection(allLines).some(
+          point => allLines.every(line => line.checkPoint(point)) && maxValue < point.x * Lmax.x! + point.y * Lmax.y!,
+        )
+      ) {
         errorMessage = 'Ответ неверный!';
       } else if (this.geometricMethod!.answer!.radio === radioAnswerEnum.point) {
         const { pointsOfArea, maxValue } = this.$refs.graphic,
@@ -317,10 +329,17 @@ export default class GeometricMethod extends Vue {
           }
           break;
         case radioAnswerEnum.noSolution: {
-          const { endX, allLines } = this.$refs.graphic,
-            axisPoint = new TPoint(endX, 0);
+          const {
+              condition: { Lmax },
+            } = this.geometricMethod!,
+            { allLines, pointsOfArea, maxValue } = this.$refs.graphic;
 
-          if (!allLines.every(line => line.checkPoint(axisPoint))) {
+          if (
+            pointsOfArea.length > 0 &&
+            TStaticZoneBuilder.pointsOfIntersection(allLines)
+              .filter(point => allLines.every(line => line.checkPoint(point)))
+              .every(point => maxValue >= point.x * Lmax.x! + point.y * Lmax.y!)
+          ) {
             errorMessage = 'Ответ неверный!';
           }
         }

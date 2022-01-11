@@ -14,7 +14,6 @@ type tMenuItems = {
   [routerNameEnum.Simplex]: tMenuItem;
   [routerNameEnum.MethodOfPotentials]: tMenuItem;
   [routerNameEnum.NetworkPlanning]: tMenuItem;
-  [routerNameEnum.Instructions]: tMenuItem;
   [Symbol.iterator]: () => Generator<tMenuItem, void, unknown>;
 };
 

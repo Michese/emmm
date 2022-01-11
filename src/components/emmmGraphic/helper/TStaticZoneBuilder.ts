@@ -9,31 +9,31 @@ class TStaticZoneBuilder {
       point => point && point.x >= startX && point.x <= endX && point.y >= startY && point.y <= endY && lines.every(line => line.checkPoint(point)),
     ) as TPoint[];
 
-    // try {
-    const linesForSortedPoints = [...lines],
-      beginPoint = filteredPoints.splice(0, 1)[0],
-      filteredPointsForSortedPoints = [...filteredPoints];
+    try {
+      const linesForSortedPoints = [...lines],
+        beginPoint = filteredPoints.splice(0, 1)[0],
+        filteredPointsForSortedPoints = [...filteredPoints];
 
-    let previousPoint: TPoint = beginPoint,
-      foundedLine: TLine = linesForSortedPoints.splice(
-        linesForSortedPoints.findIndex(line => line.checkPointOnLine(previousPoint)),
-        1,
-      )[0];
+      let previousPoint: TPoint = beginPoint,
+        foundedLine: TLine = linesForSortedPoints.splice(
+          linesForSortedPoints.findIndex(line => line.checkPointOnLine(previousPoint)),
+          1,
+        )[0];
 
-    const sortedPoints: TPoint[] = filteredPoints.map(item => {
-      const pointIndex = filteredPointsForSortedPoints.findIndex(point => foundedLine.checkPointOnLine(point));
-      previousPoint = filteredPointsForSortedPoints.splice(pointIndex, 1)[0];
-      foundedLine = linesForSortedPoints.splice(
-        linesForSortedPoints.findIndex(line => line.checkPointOnLine(previousPoint)),
-        1,
-      )[0];
-      return previousPoint;
-    });
-    sortedPoints.push(beginPoint);
-    return sortedPoints;
-    // } catch (err) {
-    //   return filteredPoints;
-    // }
+      const sortedPoints: TPoint[] = filteredPoints.map(item => {
+        const pointIndex = filteredPointsForSortedPoints.findIndex(point => foundedLine.checkPointOnLine(point));
+        previousPoint = filteredPointsForSortedPoints.splice(pointIndex, 1)[0];
+        foundedLine = linesForSortedPoints.splice(
+          linesForSortedPoints.findIndex(line => line.checkPointOnLine(previousPoint)),
+          1,
+        )[0];
+        return previousPoint;
+      });
+      sortedPoints.push(beginPoint);
+      return sortedPoints;
+    } catch (err) {
+      return filteredPoints;
+    }
   }
 
   static pointsOfIntersection(lines: TLine[]): TPoint[] {

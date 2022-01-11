@@ -106,10 +106,11 @@ export default class SimplexTableCell extends Vue {
   max-width: 100px;
   height: 70px;
   outline: 1px solid var(--dark-gray-color);
-  border: 2px dashed transparent;
+  border: 2px dotted transparent;
   background-color: var(--light-green-color);
 
   &__fraction {
+    font-weight: 500;
     overflow-x: hidden;
     overflow-wrap: unset;
     text-overflow: ellipsis;
@@ -123,7 +124,7 @@ export default class SimplexTableCell extends Vue {
   }
 
   &.disabled {
-    background-color: var(--gray-color);
+    background-color: var(--turquoise-color);
     cursor: default;
     &:hover {
       border-color: transparent;

@@ -4,7 +4,6 @@ enum routerNameEnum {
   Simplex = 'Simplex',
   MethodOfPotentials = 'MethodOfPotentials',
   NetworkPlanning = 'NetworkPlanning',
-  Instructions = 'Instructions',
 }
 
 export { routerNameEnum };

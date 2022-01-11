@@ -1,4 +1,5 @@
 import { tSimplexTable, tSimplexTableCell } from '@/views/simplex/component';
+import { generatorCells } from '@/views/simplex/component';
 
 function initialSimplexTableRows(rows: number, columns: number, isInteger = false): tSimplexTable {
   function* generateFirstRow(): Generator<tSimplexTableCell> {
@@ -10,18 +11,11 @@ function initialSimplexTableRows(rows: number, columns: number, isInteger = fals
     }
   }
 
-  function* generatorCells(constValue: string): Generator<tSimplexTableCell> {
-    yield { borderColor: null, constValue: constValue };
-    for (let i = 0; i < columns; i++) {
-      yield { borderColor: null, value: null };
-    }
-  }
-
   function* generatorRows(): Generator<tSimplexTableCell[]> {
     yield [...generateFirstRow()];
-    yield [...generatorCells(`L`)];
+    yield [...generatorCells(`L`, columns)];
     for (let row = 1; row < rows; row++) {
-      yield [...generatorCells(`y<sub>${row}</sub>`)];
+      yield [...generatorCells(`y<sub>${row}</sub>`, columns)];
     }
   }
 

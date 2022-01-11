@@ -1,5 +1,7 @@
 <template>
-  <h1>methodOfPotentials</h1>
+  <div class="container">
+    <section class="method-of-potentials"></section>
+  </div>
 </template>
 
 <script lang="ts">

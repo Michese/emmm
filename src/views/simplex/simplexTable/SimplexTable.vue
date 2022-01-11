@@ -14,7 +14,7 @@
             v-for="(cell, indexCell) in row"
             :key="`table-cell_${indexCell}`"
             :simplex-table-cell="cell"
-            :disabled="!isCurrentStep"
+            :disabled="!isCurrentStep || checkContinue"
             :click-event="clickCellEvent"
             @check="checkElement(indexRow, indexCell)"
             :checked="checkChecked(simplexTable.element, indexRow, indexCell)"
@@ -36,6 +36,7 @@
       </div>
     </div>
     <footer v-if="isCurrentStep" class="simplex-table__footer">
+      <emmm-button v-if="checkContinue" @click="$emit('continue')" class="simplex-table__back-btn">Целочисленное решение</emmm-button>
       <emmm-button @click="$emit('back')" class="simplex-table__back-btn">Назад</emmm-button>
       <emmm-button @click="applyBtnClick" :disabled="!checkApply" class="simplex-table__apply-btn">Далее</emmm-button>
     </footer>
@@ -53,7 +54,7 @@ import { Fraction } from '@/class';
 @Options({
   name: 'SimplexTable',
   components: { SimplexTableCell, EmmmButton, EmmmIcon },
-  emits: ['apply', 'back'],
+  emits: ['apply', 'back', 'continue'],
 })
 export default class SimplexTable extends Vue {
   @Prop({
@@ -78,12 +79,17 @@ export default class SimplexTable extends Vue {
   get checkApply(): boolean {
     return (
       (this.simplexTable.element && this.simplexTable.element.row !== null && this.simplexTable.element.column !== null) ||
-      (!this.simplexTable.element && this.simplexTable.cells.every(row => row.every(cell => cell.constValue !== undefined || cell.value !== null)))
+      (!this.simplexTable.element && this.simplexTable.cells.every(row => row.every(cell => cell.constValue !== undefined || cell.value !== null))) ||
+      this.checkContinue
     );
   }
 
+  get checkContinue(): boolean {
+    return !!this.simplexTable.element && this.currentReferencePlanFound && this.currentOptimalPlanFound;
+  }
+
   get top(): { title: string; href?: string } {
-    if (this.simplexTable.element && this.isCurrentStep) {
+    if (this.simplexTable.element && this.isCurrentStep && !this.checkContinue) {
       return { title: 'Нахождение разрешающего элемента', href: '#' };
     } else if (!this.previousTable) {
       return { title: 'Начальные условия', href: '#' };
@@ -99,6 +105,18 @@ export default class SimplexTable extends Vue {
       !!this.previousTable &&
       this.previousTable.cells.slice(2, this.previousTable.cells.length).every(row => new Fraction(row[1].value!).valueOf() >= 0)
     );
+  }
+
+  get currentReferencePlanFound(): boolean {
+    return this.simplexTable.cells
+      .slice(2, this.simplexTable.cells.length)
+      .every(row => row[1].value?.top && new Fraction(row[1].value).valueOf() >= 0);
+  }
+
+  get currentOptimalPlanFound(): boolean {
+    return this.simplexTable.cells[1]
+      .slice(2, this.simplexTable.cells.length)
+      .every(cell => cell.value?.top && new Fraction(cell.value).valueOf() <= 0);
   }
 
   get clickCellEvent(): 'focus' | 'check' {

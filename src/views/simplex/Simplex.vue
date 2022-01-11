@@ -16,17 +16,19 @@
         @apply="initialApply"
         class="simplex__section"
       />
-      <simplex-table
-        v-if="simplex?.simplexTable"
-        :is-current-step="simplex?.simplexTable.length - 1 === indexTable && !this.simplex.showResult"
-        :previous-table="indexTable > 0 ? simplex?.simplexTable[indexTable - 1] : undefined"
-        v-for="(simplexTable, indexTable) in simplex.simplexTable"
-        :key="`simplex-table_${indexTable}`"
-        :simplex-table="simplexTable"
-        @apply="simplexTableApply"
-        @back="simplexTableBack"
-        class="simplex__section"
-      />
+      <template v-if="simplex?.simplexTable">
+        <simplex-table
+          :is-current-step="simplex?.simplexTable.length - 1 === indexTable && !this.simplex.showResult"
+          :previous-table="indexTable > 0 && !simplexTable.isInteger ? simplex?.simplexTable[indexTable - 1] : undefined"
+          v-for="(simplexTable, indexTable) in simplex.simplexTable"
+          :key="`simplex-table_${indexTable}`"
+          :simplex-table="simplexTable"
+          @apply="simplexTableApply"
+          @back="simplexTableBack"
+          @continue="simplexTableContinue"
+          class="simplex__section"
+        />
+      </template>
       <emmm-result-section v-if="simplex?.showResult" :errors="simplex.countErrors" @back="resultBack" />
       <emmm-save-file-modal ref="saveFileModal" />
     </section>
@@ -43,12 +45,16 @@ import { Options, Vue } from 'vue-class-component';
 import { EmmmButton, EmmmIcon, EmmmResultSection, EmmmSaveFileModal } from '@/components';
 import Initial from '@/views/simplex/initial/Initial.vue';
 import SimplexTable from '@/views/simplex/simplexTable/SimplexTable.vue';
-import { tSimplex, initialSimplex } from '@/views/simplex/component';
+import {
+  tSimplex,
+  initialSimplex,
+  initialSimplexTableWithPrevious,
+  initialElement,
+  initialSimplexTableRows,
+  initialIntegerSimplexTable,
+} from '@/views/simplex/component';
 import { InjectReactive, Watch } from 'vue-property-decorator';
-import { initialSimplexTableRows } from '@/views/simplex/component/functions/initialSimplexTable';
-import { initialElement } from '@/views/simplex/component/functions/initialElement';
 import { Fraction } from '@/class';
-import { initialSimplexTableWithPrevious } from '@/views/simplex/component/functions/initialSimplexTableWithPrevious';
 
 @Options({
   name: 'Simplex',
@@ -79,8 +85,13 @@ export default class Simplex extends Vue {
     const simplexTables = this.simplex!.simplexTable!,
       simplexTable = simplexTables[simplexTables.length - 1];
     let errorMessage = '';
-
-    if (simplexTable.element) {
+    if (
+      simplexTable.element &&
+      simplexTable.cells.slice(2, simplexTable.cells.length).every(row => row[1].value?.top && new Fraction(row[1].value).valueOf() >= 0) &&
+      simplexTable.cells[1].slice(2, simplexTable.cells.length).every(cell => cell.value?.top && new Fraction(cell.value).valueOf() <= 0)
+    ) {
+      this.simplex!.showResult = true;
+    } else if (simplexTable.element) {
       if (
         simplexTable.element!.column! < 2 ||
         simplexTable.element!.row! < 2 ||
@@ -111,7 +122,7 @@ export default class Simplex extends Vue {
         this.toDown();
       }
     } else {
-      if (simplexTables.length > 1) {
+      if (simplexTables.length > 1 && !simplexTable.isInteger) {
         const previousTable = simplexTables[simplexTables.length - 2],
           previousElement = previousTable.element!,
           previousCells = previousTable.cells!;
@@ -141,10 +152,57 @@ export default class Simplex extends Vue {
             if (rightFraction.toString() !== new Fraction(cell.value!).toString()) {
               cell.value = null;
               cell.borderColor = 'orange';
-              errorMessage = 'Неверный пересчет!';
+              errorMessage = 'Пересчет выполнен неверно!';
             }
           });
         });
+      } else if (simplexTable.isInteger) {
+        const previousTable = simplexTables[simplexTables.length - 2];
+        previousTable.cells.forEach((row, rowIndex) =>
+          row.forEach((cell, columnIndex) => {
+            if (cell.constValue !== undefined) return;
+            if (
+              cell.value!.top !== simplexTable.cells[rowIndex][columnIndex].value!.top ||
+              cell.value!.bottom !== simplexTable.cells[rowIndex][columnIndex].value!.bottom
+            ) {
+              simplexTable.cells[rowIndex][columnIndex].value!.top = cell.value!.top!;
+              simplexTable.cells[rowIndex][columnIndex].value!.bottom = cell.value!.bottom!;
+              errorMessage = 'Начальные условия неизменны!';
+            }
+          }),
+        );
+        const maxInteger = Math.floor(
+            Math.max(...previousTable.cells.slice(2, previousTable.cells.length).map(row => Math.abs(new Fraction(row[1].value!).valueOf()))),
+          ),
+          lastRow = simplexTable.cells[simplexTable.cells.length - 1],
+          rowsWithMaxInteger = previousTable.cells
+            .slice(2, previousTable.cells.length)
+            .filter(row => Math.floor(Math.abs(new Fraction(row[1].value!).valueOf())) === maxInteger)
+            .filter(row => lastRow[1].value!.top < 0 && Number.isInteger(new Fraction(row[1].value!).addition(lastRow[1].value!).valueOf()));
+        if (rowsWithMaxInteger.length === 0) {
+          errorMessage = 'Строка выбрана неверно!';
+          lastRow.slice(1, lastRow.length).forEach(cell => (cell.value = null));
+        } else {
+          const indexRow = rowsWithMaxInteger.findIndex(row =>
+            row.every((cell, columnIndex) => {
+              return (
+                columnIndex === 0 ||
+                columnIndex === 1 ||
+                (lastRow[columnIndex].value!.top <= 0 &&
+                  Number.isInteger(new Fraction(row[columnIndex].value!).addition(lastRow[columnIndex].value!).valueOf()))
+              );
+            }),
+          );
+          if (indexRow === -1) {
+            rowsWithMaxInteger.forEach(row =>
+              row.forEach((cell, columnIndex) => {
+                if (columnIndex < 2) return;
+                lastRow[columnIndex].value = null;
+                errorMessage = 'Расчет выполнен неверно!';
+              }),
+            );
+          }
+        }
       }
 
       if (!errorMessage) {
@@ -170,7 +228,11 @@ export default class Simplex extends Vue {
           });
         }
 
-        if (referencePlanFound && optimalPlanFound) {
+        if (
+          referencePlanFound &&
+          optimalPlanFound &&
+          (simplexTable.cells.slice(2, simplexTable.cells.length).every(row => row[1].value!.bottom === 1) || simplexTable.element)
+        ) {
           this.simplex!.showResult = true;
         } else {
           simplexTable.element = initialElement();
@@ -181,6 +243,20 @@ export default class Simplex extends Vue {
     if (errorMessage) {
       this.simplex!.countErrors++;
       if (this.openErrorModal) this.openErrorModal(errorMessage);
+    }
+  }
+
+  simplexTableContinue(): void {
+    const simplexTables = this.simplex!.simplexTable!,
+      simplexTable = simplexTables[simplexTables.length - 1];
+
+    if (
+      simplexTable.cells[1].slice(2, simplexTable.cells[1].length).every(cell => cell.value!.top < 0) &&
+      simplexTable.cells.slice(2, simplexTable.cells.length).every(row => row[1].value!.top > 0) &&
+      simplexTable.element
+    ) {
+      this.simplex!.simplexTable!.push(initialIntegerSimplexTable(simplexTable));
+      this.toDown();
     }
   }
 

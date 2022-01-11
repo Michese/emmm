@@ -25,18 +25,12 @@ export default (function (): tMenuItems {
       key: routerNameEnum.NetworkPlanning,
       to: markRaw(defineAsyncComponent(() => import('@/views/networkPlanning/NetworkPlanning.vue'))),
     },
-    [routerNameEnum.Instructions]: {
-      title: 'Инструкции',
-      key: routerNameEnum.Instructions,
-      to: markRaw(defineAsyncComponent(() => import('@/views/instructions/Instructions.vue'))),
-    },
     *[Symbol.iterator]() {
       yield this[routerNameEnum.Home];
       yield this[routerNameEnum.GeometricMethod];
       yield this[routerNameEnum.Simplex];
       yield this[routerNameEnum.MethodOfPotentials];
       yield this[routerNameEnum.NetworkPlanning];
-      yield this[routerNameEnum.Instructions];
     },
   };
 })();
