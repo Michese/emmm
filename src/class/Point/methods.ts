@@ -42,7 +42,7 @@ const memoResultPoint: (axis: number, cellSizePx: number, shiftXPx: number, cell
   },
 );
 
-// function intersection(): boolean {
+// functions intersection(): boolean {
 //   const x1 = this.firstPoint.x,
 //     y1 = this.firstPoint.y,
 //     x2 = this.secondPoint.x,
