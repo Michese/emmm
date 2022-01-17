@@ -109,7 +109,12 @@ export default class MethodOfPotentials extends Vue {
         const totalRow = row.slice(0, row.length - 1).reduce((total, cell) => total + (cell.value === null ? 0 : cell.value!), 0);
         if (totalRow !== row[row.length - 1].value) {
           errorMessage = 'Таблица заполнена неверно!';
-          row.slice(0, row.length - 1).forEach(cell => (cell.value = null));
+          row.slice(0, row.length - 1).forEach(cell => {
+            if (cell.value !== null) {
+              if (cell.value !== 0) cell.borderColor = colorEnum.orange;
+              cell.value = null;
+            }
+          });
         }
       });
 
@@ -151,6 +156,7 @@ export default class MethodOfPotentials extends Vue {
                 : 0)
           ) {
             cell.value = null;
+            cell.borderColor = colorEnum.orange;
             errorMessage = 'Таблица заполнена неверно!';
           }
         }),
@@ -273,14 +279,23 @@ export default class MethodOfPotentials extends Vue {
     if (potentialTable.step > 1) {
       if (potentialTable.step === 2) {
         if (this.methodOfPotentials!.potentialTables!.length === 1) {
-          potentialTable.cells
-            .slice(0, potentialTable.cells.length - 1)
-            .forEach(row => row.slice(0, row.length - 1).forEach(cell => (cell.value = null)));
+          potentialTable.cells.slice(0, potentialTable.cells.length - 1).forEach(row =>
+            row.slice(0, row.length - 1).forEach(cell => {
+              cell.value = null;
+              cell.borderColor = null;
+            }),
+          );
         } else if (this.methodOfPotentials!.potentialTables!.length === 2) {
           this.methodOfPotentials!.potentialTables!.splice(this.methodOfPotentials!.potentialTables!.length - 1, 1);
         } else {
-          potentialTable.cells.slice(0, potentialTable.cells.length - 1).forEach(row => (row[row.length - 1].value = null));
-          potentialTable.cells[potentialTable.cells.length - 1].forEach(cell => (cell.value = null));
+          potentialTable.cells.slice(0, potentialTable.cells.length - 1).forEach(row => {
+            row[row.length - 1].value = null;
+            row[row.length - 1].borderColor = null;
+          });
+          potentialTable.cells[potentialTable.cells.length - 1].forEach(cell => {
+            cell.value = null;
+            cell.borderColor = null;
+          });
         }
       } else if (potentialTable.step === 3) {
         potentialTable.cells.slice(0, potentialTable.cells.length - 1).forEach(row =>

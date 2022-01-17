@@ -26,7 +26,8 @@
             :key="`potential-table__cell-${indexColumn}`"
             :ref="`cell_${indexRow}_${indexColumn}`"
             @click="
-              (checkPathEnabled(indexRow, indexColumn) && addToPath(indexRow, indexColumn)) ||
+              clickCell() ||
+                (checkPathEnabled(indexRow, indexColumn) && addToPath(indexRow, indexColumn)) ||
                 (checkMinCell(indexRow, indexColumn) && clickMinCell(indexRow, indexColumn))
             "
             :is-min-cell="potentialTable.minCell.row === indexRow && potentialTable.minCell.column === indexColumn"
@@ -149,6 +150,11 @@ export default class PotentialTable extends Vue {
               this.potentialTable.path[this.potentialTable.path.length - 1].column === this.potentialTable.path[0].column)) ||
           (this.potentialTable.step === 5 && this.potentialTable.minCell.row !== null && this.potentialTable.minCell.column !== null)))
     );
+  }
+
+  clickCell(): false {
+    this.potentialTable.cells.forEach(row => row.forEach(cell => (cell.borderColor = null)));
+    return false;
   }
 
   checkMinCell(row: number, column: number): boolean {
