@@ -116,17 +116,32 @@ export default class GeometricMethod extends Vue {
   }
 
   initialApply(): void {
+    let errorMessage = '';
     const {
-      condition: { Lmax },
+      condition: { Lmax, inequalities },
     } = this.geometricMethod!;
 
-    if (Lmax.x !== 0 || Lmax.y !== 0) {
-      this.geometricMethod!.pointsForLines = initialPointsForLines();
-      this.toDown();
-    } else {
+    if (Lmax.x === 0 && Lmax.y === 0) {
       Lmax.x = null;
       Lmax.y = null;
+      errorMessage = 'Введены недопустимые значения!';
+    }
+
+    if (inequalities.some(inequality => inequality.x === 0 && inequality.y === 0)) {
+      inequalities.forEach(inequality => {
+        if (inequality.x === 0 && inequality.y === 0) {
+          inequality.x = null;
+          inequality.y = null;
+        }
+      });
+      errorMessage = 'Введены недопустимые значения!';
+    }
+
+    if (errorMessage) {
       if (this.openErrorModal) this.openErrorModal('Введены недопустимые значения!');
+    } else {
+      this.geometricMethod!.pointsForLines = initialPointsForLines();
+      this.toDown();
     }
   }
 
@@ -158,7 +173,7 @@ export default class GeometricMethod extends Vue {
         } else if (pointsForLines[index].lines.slice(indexPoint + 1).some(point2 => point.x === point2.x && point.y === point2.y)) {
           point.x = null;
           point.y = null;
-          errorMessage = 'Нельзя выбирать одни и те же точки!';
+          errorMessage = 'Построение прямой по одной точке невозможно!';
         }
       });
     });

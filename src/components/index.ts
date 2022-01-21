@@ -1,4 +1,3 @@
-export * from './emmmCreatorLine';
 export * from './emmmFraction';
 export * from './emmmGraphic';
 export * from './emmmSprite';

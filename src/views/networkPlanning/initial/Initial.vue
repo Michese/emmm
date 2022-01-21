@@ -12,8 +12,8 @@
     <span class="initial__title">Параметры задачи</span>
     <div class="initial__parameters">
       <div class="initial__titles">
-        <span class="initial__parameter">Количество строк</span>
-        <span class="initial__parameter">Количество столбцов</span>
+        <span class="initial__parameter">Количество рангов</span>
+        <span class="initial__parameter">Количество видов работ</span>
       </div>
       <div class="initial__inputs">
         <emmm-input
@@ -21,7 +21,7 @@
           type="number"
           :disabled="!isCurrentStep"
           :value="parameters.rows"
-          @input="onInput('rows', $event.target.value)"
+          @change="onInput('rows', $event.target.value)"
           :max="maxNum"
           :min="minNum"
         />
@@ -30,7 +30,7 @@
           type="number"
           :disabled="!isCurrentStep"
           :value="parameters.columns"
-          @input="onInput('columns', $event.target.value)"
+          @change="onInput('columns', $event.target.value)"
           :max="maxNum"
           :min="minNum"
         />
@@ -47,7 +47,7 @@
 import { Options, Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import { colorEnum, EmmmButton, EmmmIcon, EmmmInput, EmmmUpload } from '@/components';
-import { tParameters } from '@/views/methodOfPotentials/component';
+import { tParameters } from '@/views/networkPlanning/component';
 
 @Options({
   name: 'Initial',
@@ -84,11 +84,11 @@ export default class Initial extends Vue {
   }
 
   get checkParameters(): boolean {
-    return this.parameters.rows !== null && this.parameters.columns !== null;
+    return this.parameters.columns !== null;
   }
 
   get maxNum(): number {
-    return 8;
+    return 15;
   }
 
   get minNum(): number {
@@ -114,6 +114,7 @@ export default class Initial extends Vue {
 
   onInput(key: 'rows' | 'columns', value: string): void {
     this.parameters[key] = null;
+
     this.$nextTick(() => {
       this.parameters[key] = this.parseInt(value);
     });

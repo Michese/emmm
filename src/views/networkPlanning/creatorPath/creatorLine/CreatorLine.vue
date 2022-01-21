@@ -1,7 +1,11 @@
 <template>
-  <teleport to="body">
-    <svg :width="length" :height="strokeWidth" xmlns="http://www.w3.org/2000/svg" :style="lineStyles" class="creator_line" />
-  </teleport>
+  <svg :width="length" :height="strokeWidth" xmlns="http://www.w3.org/2000/svg" :style="lineStyles" class="creator_line">
+    <polyline
+      :points="`0, 5 ${length}, 5 ${length - 8}, 0 ${length}, 5 ${length - 8}, 10 ${length}, 5 0, 5`"
+      stroke-width="2"
+      :stroke="strokeColor"
+    />
+  </svg>
 </template>
 
 <script lang="ts">
@@ -9,20 +13,20 @@ import { Options, Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 
 @Options({
-  name: 'EmmmCreatorLine',
+  name: 'CreatorLine',
 })
-export default class EmmmCreatorLine extends Vue {
+export default class CreatorLine extends Vue {
   @Prop({
     type: Number,
     required: false,
-    default: () => 2,
+    default: () => 10,
   })
   strokeWidth!: number;
 
   @Prop({
     type: String,
     required: false,
-    default: () => 'red',
+    default: () => 'var(--blue-color)',
   })
   strokeColor!: string;
 
@@ -50,9 +54,8 @@ export default class EmmmCreatorLine extends Vue {
   })
   y2!: number;
 
-  get lineStyles(): { backgroundColor: string; transform: string } {
+  get lineStyles(): { transform: string } {
     return {
-      backgroundColor: this.strokeColor,
       transform: `translate(${this.x1}px, ${this.y1}px) rotate(${this.degrees}rad)`,
     };
   }
@@ -70,7 +73,7 @@ export default class EmmmCreatorLine extends Vue {
   }
 
   get degrees(): number {
-    return Math.acos(this.distanceX / this.length);
+    return (this.y2 > this.y1 ? 1 : -1) * Math.acos((this.x2 - this.x1) / this.length) ;
   }
 }
 </script>

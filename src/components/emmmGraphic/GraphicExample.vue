@@ -9,7 +9,7 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import StaticLine from '@/components/emmmGraphic/EmmmLine.vue';
-import CreatorLine from '@/components/emmmCreatorLine/EmmmCreatorLine.vue';
+import CreatorLine from '@/views/networkPlanning/creatorPath/creatorLine/CreatorLine.vue';
 import { EmmmGraphic, GraphicBuilder, EmmmPoint, TPoint, TLine, EmmmZone, TStaticZoneBuilder, EmmmNormalVector } from '.';
 
 const startX = -5,

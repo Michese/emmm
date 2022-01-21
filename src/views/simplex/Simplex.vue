@@ -111,7 +111,7 @@ export default class Simplex extends Vue {
             .slice(2, simplexTable.cells.length)
             .map(row => new Fraction(row[1].value!).division(row[simplexTable.element!.column!].value!))
             .filter(fraction => fraction.valueOf() > 0),
-          minFraction = Math.min(...fractions.map(fraction => fraction.valueOf()), valueFraction);
+          minFraction = Math.min(...fractions.map(fraction => fraction.valueOf()), valueFraction > 0 ? valueFraction : Infinity);
         if (valueFraction !== minFraction) {
           errorMessage = 'Разрешающий элемент выбран неверно!';
         }

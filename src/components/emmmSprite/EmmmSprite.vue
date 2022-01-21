@@ -163,4 +163,8 @@ export default class EmmmSprite extends Vue {}
   height: 1em;
   width: 1em;
 }
+
+#arrow {
+  fill: var(--blue-color);
+}
 </style>

@@ -34,6 +34,7 @@ export default class PageMenu extends Vue {
 <style lang="scss" scoped>
 .page-menu {
   min-width: 100px;
+  max-width: 330px;
   background-color: var(--light-green-color);
 
   &_active {
@@ -57,6 +58,7 @@ export default class PageMenu extends Vue {
     background-color: transparent;
     border: none;
     cursor: pointer;
+    text-align: left;
 
     &.active {
       background-color: var(--blue-color);
