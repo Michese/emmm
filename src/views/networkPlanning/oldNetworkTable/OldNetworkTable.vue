@@ -46,7 +46,7 @@
           </network-table-cell>
           <network-table-cell
             :disabled="!isEnteringNewDesignations || !checkDesignationCellArray[indexColumn]"
-            @click="isEnteringNewDesignations && clickDesignationCell(indexColumn)"
+            @click="isEnteringNewDesignations && checkDesignationCellArray[indexColumn] && clickDesignationCell(indexColumn)"
             :min="1"
             :max="oldWorks.length"
           >

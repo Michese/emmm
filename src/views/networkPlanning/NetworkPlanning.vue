@@ -56,7 +56,9 @@
       />
     </div>
 
-    <emmm-result-section v-if="networkPlanning?.showResult" :errors="networkPlanning.countErrors" @back="resultBack" />
+    <div class="container">
+      <emmm-result-section v-if="networkPlanning?.showResult" :errors="networkPlanning.countErrors" @back="resultBack" />
+    </div>
     <emmm-save-file-modal ref="saveFileModal" />
   </section>
   <a href="#footer" ref="linkFooter" tabindex="-1" />
