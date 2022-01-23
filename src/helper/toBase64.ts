@@ -6,5 +6,3 @@ export default function toBase64(file: File): Promise<string | ArrayBuffer | nul
     reader.onerror = error => reject(error);
   });
 }
-
-// const stringBase64: string = (await toBase64(file)) as string;

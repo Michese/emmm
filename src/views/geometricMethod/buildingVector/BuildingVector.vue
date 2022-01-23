@@ -47,7 +47,7 @@
 import { Options, Vue } from 'vue-class-component';
 import { EmmmButton, EmmmIcon, EmmmInput } from '@/components';
 import { Emit, Prop } from 'vue-property-decorator';
-import { tPointsForVector } from '@/views/geometricMethod/types';
+import { tPointsForVector } from '@/views/geometricMethod/component/types';
 
 @Options({
   name: 'BuildingVector',

@@ -37,9 +37,9 @@
       </div>
     </div>
 
-    <div v-if="isCurrentStep" class="initial__apply-btn">
+    <footer v-if="isCurrentStep" class="initial__apply-btn">
       <emmm-button @click="applyBtnClick" :disabled="!checkParameters">Далее</emmm-button>
-    </div>
+    </footer>
   </section>
 </template>
 

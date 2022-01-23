@@ -90,7 +90,10 @@ export default class NetworkTableCell extends Vue {
   }
 
   get cellStyles(): CSSStyleRule | any {
-    return { ...(this.styles ? this.styles : undefined), ...(this.inputCell?.borderColor ? { borderColor: this.inputCell.borderColor } : {}) };
+    return {
+      ...(this.styles ? this.styles : undefined),
+      ...(this.inputCell?.borderColor ? { borderColor: `var(--${this.inputCell.borderColor}-color)` } : {}),
+    };
   }
 
   change(value: number): void {

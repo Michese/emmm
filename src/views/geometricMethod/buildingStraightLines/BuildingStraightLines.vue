@@ -48,7 +48,7 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import { Emit, Prop } from 'vue-property-decorator';
-import { tPointsForLine } from '@/views/geometricMethod/types';
+import { tPointsForLine } from '@/views/geometricMethod/component/types';
 import { EmmmButton, EmmmIcon, EmmmInput } from '@/components';
 
 @Options({

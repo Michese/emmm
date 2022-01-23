@@ -25,15 +25,15 @@ export default (function (): tMenuItems {
       key: routerNameEnum.NetworkPlanning,
       to: markRaw(defineAsyncComponent(() => import('@/views/networkPlanning/NetworkPlanning.vue'))),
     },
-    [routerNameEnum.InvestmentOfFunds]: {
-      title: 'Вложение средств',
-      key: routerNameEnum.InvestmentOfFunds,
-      to: markRaw(defineAsyncComponent(() => import('@/views/investmentOfFunds/InvestmentOfFunds.vue'))),
-    },
     [routerNameEnum.RedistributionOfFunds]: {
       title: 'Перераспределение средств',
       key: routerNameEnum.RedistributionOfFunds,
       to: markRaw(defineAsyncComponent(() => import('@/views/redistributionOfFunds/RedistributionOfFunds.vue'))),
+    },
+    [routerNameEnum.InvestmentOfFunds]: {
+      title: 'Вложение средств',
+      key: routerNameEnum.InvestmentOfFunds,
+      to: markRaw(defineAsyncComponent(() => import('@/views/investmentOfFunds/InvestmentOfFunds.vue'))),
     },
     *[Symbol.iterator]() {
       yield this[routerNameEnum.Home];
@@ -41,8 +41,8 @@ export default (function (): tMenuItems {
       yield this[routerNameEnum.Simplex];
       yield this[routerNameEnum.MethodOfPotentials];
       yield this[routerNameEnum.NetworkPlanning];
-      yield this[routerNameEnum.InvestmentOfFunds];
       yield this[routerNameEnum.RedistributionOfFunds];
+      yield this[routerNameEnum.InvestmentOfFunds];
     },
   };
 })();

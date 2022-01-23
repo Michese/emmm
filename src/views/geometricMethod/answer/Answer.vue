@@ -73,9 +73,7 @@
 import { Options, Vue } from 'vue-class-component';
 import { EmmmButton, EmmmIcon, EmmmInput, EmmmRadio } from '@/components';
 import { Emit, Prop } from 'vue-property-decorator';
-import { tAnswer } from '@/views/geometricMethod/types';
-import { radioAnswerEnum } from '@/views/geometricMethod/enums';
-import changeRadioAnswer from '@/views/geometricMethod/changeRadioAnswer';
+import { tAnswer, changeRadioAnswer, radioAnswerEnum } from '@/views/geometricMethod/component';
 
 @Options({
   name: 'Answer',

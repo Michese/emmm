@@ -76,7 +76,7 @@
 import { Options, Vue } from 'vue-class-component';
 import { colorEnum, EmmmButton, EmmmIcon, EmmmInput, EmmmUpload } from '@/components';
 import { Emit, Prop } from 'vue-property-decorator';
-import { tCondition } from '@/views/geometricMethod/types';
+import { tCondition } from '@/views/geometricMethod/component/types';
 
 @Options({
   name: 'Initial',

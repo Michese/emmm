@@ -70,18 +70,20 @@
 import { Options, Vue } from 'vue-class-component';
 import { EmmmButton, EmmmIcon, EmmmResultSection, EmmmSaveFileModal, TLine, TPoint, TStaticZoneBuilder } from '@/components';
 import Initial from './initial/Initial.vue';
-import { tGeometricMethod } from '@/views/geometricMethod/types';
+import {
+  radioAnswerEnum,
+  tGeometricMethod,
+  initialPointsForLines,
+  initialPointsForVector,
+  initialPointVectorForGraphic,
+  initialGeometricMethod,
+  initialAnswer,
+} from '@/views/geometricMethod/component';
 import BuildingStraightLines from '@/views/geometricMethod/buildingStraightLines/BuildingStraightLines.vue';
 import { InjectReactive, Watch } from 'vue-property-decorator';
-import initialPointsForLines from '@/views/geometricMethod/initialPointsForLines';
 import GeometricMethodGraphic from '@/views/geometricMethod/geometricMethodGraphic/GeometricMethodGraphic.vue';
 import BuildingVector from '@/views/geometricMethod/buildingVector/BuildingVector.vue';
 import Answer from '@/views/geometricMethod/answer/Answer.vue';
-import initialGeometricMethod from '@/views/geometricMethod/initialGeometricMethod';
-import initialPointsForVector from '@/views/geometricMethod/initialPointsForVector';
-import initialPointVectorForGraphic from '@/views/geometricMethod/initialPointVectorForGraphic';
-import initialAnswer from '@/views/geometricMethod/initialAnswer';
-import { radioAnswerEnum } from '@/views/geometricMethod/enums';
 
 @Options({
   name: 'GeometricMethod',

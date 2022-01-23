@@ -1,7 +1,7 @@
-import { tAnswer } from '@/views/geometricMethod/types';
-import { radioAnswerEnum } from '@/views/geometricMethod/enums';
+import { tAnswer } from '@/views/geometricMethod/component/types';
+import { radioAnswerEnum } from '@/views/geometricMethod/component/enums';
 
-export default function (radio: string): tAnswer {
+function changeRadioAnswer(radio: string): tAnswer {
   if (radio === radioAnswerEnum.point) {
     return { Lmax: null, radio, points: [{ x: null, y: null }] };
   } else if (radio === radioAnswerEnum.line) {
@@ -19,3 +19,5 @@ export default function (radio: string): tAnswer {
     throw new Error('Нет такого значения radio!');
   }
 }
+
+export { changeRadioAnswer };

@@ -34,7 +34,7 @@
     </section>
   </div>
   <a href="#footer" ref="linkFooter" tabindex="-1" />
-  <footer v-if="true" class="simplex__footer" id="footer">
+  <footer class="simplex__footer" id="footer">
     <emmm-button :background="'blue'" @click="saveFile">Сохранить</emmm-button>
     <emmm-button :background="`orange`" @click="fullReset">Очистить</emmm-button>
   </footer>
@@ -42,7 +42,7 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import { EmmmButton, EmmmIcon, EmmmResultSection, EmmmSaveFileModal } from '@/components';
+import { colorEnum, EmmmButton, EmmmIcon, EmmmResultSection, EmmmSaveFileModal } from '@/components';
 import Initial from '@/views/simplex/initial/Initial.vue';
 import SimplexTable from '@/views/simplex/simplexTable/SimplexTable.vue';
 import {
@@ -125,7 +125,7 @@ export default class Simplex extends Vue {
       if (simplexTables.length > 1 && !simplexTable.isInteger) {
         const previousTable = simplexTables[simplexTables.length - 2],
           previousElement = previousTable.element!,
-          previousCells = previousTable.cells!;
+          previousCells = previousTable.cells;
 
         simplexTable.cells.forEach((row, rowIndex) => {
           row.forEach((cell, columnIndex) => {
@@ -151,7 +151,7 @@ export default class Simplex extends Vue {
 
             if (rightFraction.toString() !== new Fraction(cell.value!).toString()) {
               cell.value = null;
-              cell.borderColor = 'orange';
+              cell.borderColor = colorEnum.orange;
               errorMessage = 'Пересчет выполнен неверно!';
             }
           });
@@ -211,7 +211,7 @@ export default class Simplex extends Vue {
         simplexTable.cells.slice(2, simplexTable.cells.length).forEach(row => {
           if (row[1].value!.top < 0) {
             referencePlanFound = false;
-            row[1].borderColor = 'orange';
+            row[1].borderColor = colorEnum.orange;
           } else {
             row[1].borderColor = null;
           }
@@ -221,7 +221,7 @@ export default class Simplex extends Vue {
           simplexTable.cells[1].slice(2, simplexTable.cells[1].length).forEach(cell => {
             if (cell.value!.top > 0) {
               optimalPlanFound = false;
-              cell.borderColor = 'orange';
+              cell.borderColor = colorEnum.orange;
             } else {
               cell.borderColor = null;
             }
@@ -234,6 +234,7 @@ export default class Simplex extends Vue {
           (simplexTable.cells.slice(2, simplexTable.cells.length).every(row => row[1].value!.bottom === 1) || simplexTable.element)
         ) {
           this.simplex!.showResult = true;
+          this.toDown();
         } else {
           simplexTable.element = initialElement();
         }

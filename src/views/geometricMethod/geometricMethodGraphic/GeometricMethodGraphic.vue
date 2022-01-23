@@ -43,7 +43,7 @@ import {
   TStaticZoneBuilder,
 } from '@/components';
 import { InjectReactive, Prop } from 'vue-property-decorator';
-import { tCondition, tPointVectorForGraphic } from '@/views/geometricMethod/types';
+import { tCondition, tPointVectorForGraphic } from '@/views/geometricMethod/component/types';
 
 @Options({
   name: 'GeometricMethodGraphic',

@@ -1,4 +1,4 @@
-import { radioAnswerEnum } from '@/views/geometricMethod/enums';
+import { radioAnswerEnum } from '@/views/geometricMethod/component/enums';
 
 type tGeometricMethod = {
   condition: tCondition;
