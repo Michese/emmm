@@ -47,11 +47,12 @@ export default class Home extends Vue {
 
   get homeItems(): tHomeItem[] {
     return [
-      { title: 'Геометрический метод', download: this.mainImageSrc },
+      { title: 'Геометрический метод', download: '' },
       { title: 'Симплекс-метод', download: '' },
       { title: 'Метод потенциалов', download: '' },
       { title: 'Сетевое планирование', download: '' },
-      { title: 'Инструкции', download: '' },
+      { title: 'Перераспределение средств', download: '' },
+      { title: 'Вложение средств', download: '' },
     ];
   }
 

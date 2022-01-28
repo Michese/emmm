@@ -20,22 +20,24 @@ type tVectorPoint = {
   x3: number | null;
 };
 
-type tCase = {
-  system: {
-    t: {
-      x2: number | null;
-      x3: number | null;
-      coefficient: number | null;
-    };
-    first: {
-      x2: number | null;
-      x3: number | null;
-      coefficient: number | null;
-    };
-    second: number | null;
-    third: number | null;
-    fourth: number | null;
+type tSystem = {
+  t: {
+    x2: number | null;
+    x3: number | null;
+    coefficient: number | null;
   };
+  first: {
+    x2: number | null;
+    x3: number | null;
+    coefficient: number | null;
+  };
+  second: number | null;
+  third: number | null;
+  fourth: number | null;
+};
+
+type tCase = {
+  system: tSystem;
   vectorPoints: tVectorPoint[] | null;
   vector: tVector | null;
   answer: tAnswer | null;
@@ -49,4 +51,4 @@ type tRedistributionOfFunds = {
   showResult: boolean;
 };
 
-export { tRedistributionOfFunds, tCondition, tCase, tVectorPoint, tVector, tAnswer };
+export { tRedistributionOfFunds, tCondition, tCase, tVectorPoint, tVector, tAnswer, tSystem };

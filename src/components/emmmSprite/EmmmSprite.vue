@@ -114,6 +114,16 @@
         />
       </g>
     </symbol>
+    <symbol id="curly-brace">
+      <g>
+        <path
+          d="M22 2C18 2 12 11.325 12 48.625C12 85.925 12 104.575 12 132.55C12 160.525 2 179.175 2 179.175C2 179.175 12 197.825 12 225.8C12 253.775 12 291.075 12 328.375C12 365.675 18 375 22 375"
+          stroke-width="4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+    </symbol>
   </svg>
 </template>
 
@@ -166,5 +176,11 @@ export default class EmmmSprite extends Vue {}
 
 #arrow {
   fill: var(--blue-color);
+}
+
+#curly-brace {
+  stroke: black;
+  width: 1em;
+  height: 15.71em;
 }
 </style>

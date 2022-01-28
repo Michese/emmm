@@ -131,16 +131,19 @@ export default class EmmmNormalVector extends Vue {
   get points(): string {
     if (!this.startPoint) return ``;
 
-    const moreX = this.vector.x >= this.vector.y,
+    const moreX = Math.abs(this.vector.x) >= Math.abs(this.vector.y),
       { x, y } = this.currentPoint,
       { sizeCellPx } = this.graphicBuilder,
-      ratioVectorX = this.vector.x / this.vector.y;
-    return `${x}, ${y} ${x - (moreX ? sizeCellPx / ratioVectorX : sizeCellPx) / 4}
-      ${y - (moreX ? sizeCellPx : sizeCellPx * ratioVectorX) / 4}
-    ${x + (moreX ? sizeCellPx / ratioVectorX : sizeCellPx) / 4}, ${y + (moreX ? sizeCellPx : sizeCellPx * ratioVectorX) / 4} ${x}, ${y} ${
-      x + (moreX ? sizeCellPx : sizeCellPx * ratioVectorX) / 2
-    },
-    ${y - (moreX ? sizeCellPx / ratioVectorX : sizeCellPx) / 2}`;
+      ratioVectorX = Math.abs(this.vector.x / this.vector.y),
+      signX = this.vector.x >= 0,
+      signY = this.vector.y >= 0;
+
+    return `${x}, ${y} ${x - ((signY ? 1 : -1) * (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)) / 4}
+      ${y - ((signX ? 1 : -1) * (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)) / 4}
+    ${x + ((signY ? 1 : -1) * (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)) / 4}, ${
+      y + ((signX ? 1 : -1) * (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)) / 4
+    } ${x}, ${y} ${x + ((signX ? 1 : -1) * (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)) / 2},
+    ${y - ((signY ? 1 : -1) * (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)) / 2}`;
   }
 
   get backgroundPoints(): string {
@@ -149,13 +152,16 @@ export default class EmmmNormalVector extends Vue {
     const moreX = this.vector.x >= this.vector.y,
       { x, y } = this.currentPoint,
       { sizeCellPx } = this.graphicBuilder,
-      ratioVectorX = this.vector.x / this.vector.y;
+      ratioVectorX = this.vector.x / this.vector.y,
+      signX = this.vector.x >= 0,
+      signY = this.vector.y >= 0;
 
-    return `${x - (moreX ? sizeCellPx / ratioVectorX : sizeCellPx) / 2}
-      ${y - (moreX ? sizeCellPx : sizeCellPx * ratioVectorX) / 2}
-    ${x + (moreX ? sizeCellPx / ratioVectorX : sizeCellPx) / 2}, ${y + (moreX ? sizeCellPx : sizeCellPx * ratioVectorX) / 2}
-     ${x + (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)},
-    ${y - (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)}`;
+    return `${x - ((signY ? 1 : -1) * (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)) / 2}
+      ${y - ((signX ? 1 : -1) * (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)) / 2}
+    ${x + ((signY ? 1 : -1) * (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)) / 2}, ${
+      y + ((signX ? 1 : -1) * (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)) / 2
+    } ${x + (signX ? 1 : -1) * (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)},
+    ${y - (signY ? 1 : -1) * (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)}`;
   }
 }
 </script>

@@ -146,22 +146,26 @@ export default class InvestmentOfFunds extends Vue {
     const { coefficients, t2, t4, t6 } = this.investmentOfFunds!.conditions;
 
     this.investmentOfFunds!.firstCase!.forEach((condition, index) => {
-      if (condition.coef !== coefficients[index].t) {
+      if (Math.abs(condition.coef! - coefficients[index].t!) >= 0.0001) {
         errorMessage = 'Значение указано неверно!';
         condition.coef = null;
       }
 
-      if (condition.a !== coefficients[index].x) {
+      if (Math.abs(condition.a! - coefficients[index].x!) >= 0.0001) {
         errorMessage = 'Значение указано неверно!';
         condition.a = null;
       }
 
-      if (condition.x !== coefficients[index].upperBound) {
+      if (Math.abs(condition.x! - coefficients[index].upperBound!) >= 0.0001) {
         errorMessage = 'Значение указано неверно!';
         condition.x = null;
       }
 
-      if ((index === 0 && condition.t !== t2) || (index === 1 && condition.t !== t4) || (index === 2 && condition.t !== t6)) {
+      if (
+        (index === 0 && Math.abs(condition.t! - t2!) >= 0.0001) ||
+        (index === 1 && Math.abs(condition.t! - t4!) >= 0.0001) ||
+        (index === 2 && Math.abs(condition.t! - t6!) >= 0.0001)
+      ) {
         errorMessage = 'Значение указано неверно!';
         condition.t = null;
       }
@@ -209,14 +213,20 @@ export default class InvestmentOfFunds extends Vue {
     let errorMessage = '';
 
     if (
-      this.investmentOfFunds!.secondCase!.criticalTime !== this.investmentOfFunds!.conditions.coefficients.reduce((total, coef) => total + coef.t!, 0)
+      Math.abs(
+        this.investmentOfFunds!.secondCase!.criticalTime! -
+          this.investmentOfFunds!.conditions.coefficients.reduce((total, coef) => total + coef.t!, 0),
+      ) >= 0.0001
     ) {
       this.investmentOfFunds!.secondCase!.criticalTime = null;
       this.investmentOfFunds!.secondCase!.differenceTime = null;
       errorMessage = 'Критическое время вычислено неверно!';
     } else if (
-      this.investmentOfFunds!.secondCase!.differenceTime !==
-      this.investmentOfFunds!.secondCase!.criticalTime - this.investmentOfFunds!.conditions.T0!
+      Math.abs(
+        this.investmentOfFunds!.secondCase!.differenceTime! -
+          this.investmentOfFunds!.secondCase!.criticalTime! +
+          this.investmentOfFunds!.conditions.T0!,
+      ) >= 0.0001
     ) {
       this.investmentOfFunds!.secondCase!.differenceTime = null;
       errorMessage = 'Величина снижения времени вычислена неверно!';
@@ -304,18 +314,19 @@ export default class InvestmentOfFunds extends Vue {
     const criticalTime = this.investmentOfFunds!.conditions.coefficients.reduce((total, coef) => total + coef.t!, 0);
     let rightPart = criticalTime - this.investmentOfFunds!.conditions.T0!,
       resultX = this.investmentOfFunds!.conditions.coefficients.map(coef => coef.t! * coef.x!);
-    while (!Number.isInteger(rightPart) || !resultX.every(x => Number.isInteger(x))) {
+
+    while (Math.abs(rightPart - Math.round(rightPart)) >= 0.00001 || resultX.some(x => Math.abs(x - Math.round(x)) >= 0.0001)) {
       rightPart *= 10;
       resultX = resultX.map(x => x * 10);
     }
 
-    if (this.investmentOfFunds!.Lmin!.result! !== rightPart) {
+    if (Math.abs(this.investmentOfFunds!.Lmin!.result! - rightPart) >= 0.0001) {
       this.investmentOfFunds!.Lmin!.result = null;
       errorMessage = 'Неравенство составлено неверно!';
     }
 
     this.investmentOfFunds!.Lmin!.coefficients.forEach((coef, index) => {
-      if (coef.x !== resultX[index]) {
+      if (Math.abs(coef.x! - resultX[index]) >= 0.0001) {
         coef.x = null;
         errorMessage = 'Неравенство составлено неверно!';
       }
@@ -325,6 +336,11 @@ export default class InvestmentOfFunds extends Vue {
       if (this.openErrorModal) this.openErrorModal(errorMessage);
       this.investmentOfFunds!.countErrors++;
     } else {
+      this.investmentOfFunds!.Lmin!.result = Math.round(this.investmentOfFunds!.Lmin!.result!);
+      this.investmentOfFunds!.Lmin!.coefficients.forEach(coef => {
+        coef.x = Math.round(coef.x!);
+      });
+
       this.investmentOfFunds!.simplexTables = [initialSimplexTableRows(6, 5)];
       this.toDown();
     }

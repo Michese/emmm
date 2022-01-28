@@ -84,12 +84,17 @@ export default class EmmmRadio extends Vue {
     display: none;
   }
 
+  &__label:hover > &__circle {
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+  }
+
   &__body:checked + &__circle {
     background-color: var(--blue-color);
   }
 
   &__body:disabled + &__circle {
     outline: 5px solid var(--gray-color);
+    box-shadow: none;
   }
 
   &__label {

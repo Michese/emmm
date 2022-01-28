@@ -19,16 +19,36 @@
     <div class="initial__conditions">
       <div class="initial__column">
         <span v-for="(condition, index) in conditions" :key="`condition_${index}`" class="initial_condition">
-          t<sup>o</sup><sub>{{ index + 1 }}</sub> =
-          <emmm-input class="initial__input" :disabled="!isCurrentStep" :value="condition.t" @input="$event => (condition.t = $event.target.value)" />
-          {{ index === 0 ? '+' : '-' }} α<sub>{{ index + 1 }}</sub> =
-          <emmm-input class="initial__input" :disabled="!isCurrentStep" :value="condition.a" @input="$event => (condition.a = $event.target.value)" />
+          t<sub>{{ index + 1 }}</sub> =
+          <emmm-input
+            class="initial__input"
+            type="number"
+            :disabled="!isCurrentStep"
+            :value="condition.t"
+            @input="$event => (condition.t = +$event.target.value)"
+          />
+          (1 {{ index === 0 ? '+' : '-' }}
+          <emmm-input
+            class="initial__input"
+            type="number"
+            :disabled="!isCurrentStep"
+            :value="condition.a"
+            @input="$event => (condition.a = +$event.target.value)"
+          />
+          x<sub>{{ index + 1 }}</sub>
+          ),
         </span>
       </div>
       <div class="initial__column">
         <span v-for="(condition, index) in conditions" :key="`condition_${index}`" class="initial_condition">
           0 &#8804; x<sub>{{ index + 1 }}</sub> &#8804;
-          <emmm-input class="initial__input" :disabled="!isCurrentStep" :value="condition.x" @input="$event => (condition.x = $event.target.value)" />
+          <emmm-input
+            class="initial__input"
+            type="number"
+            :disabled="!isCurrentStep"
+            :value="condition.x"
+            @input="$event => (condition.x = +$event.target.value)"
+          />
         </span>
       </div>
     </div>

@@ -6,6 +6,7 @@
         <emmm-icon class="question__icon" icon="question" :size="40" />
       </a>
     </span>
+
     <div class="geometric-method-graphic__inner">
       <emmm-graphic
         v-if="graphicBuilder"

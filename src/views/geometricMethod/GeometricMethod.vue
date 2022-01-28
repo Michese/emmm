@@ -203,12 +203,18 @@ export default class GeometricMethod extends Vue {
 
     let result;
 
-    if (Lmax.x === 0) {
-      result = diffX === 0;
+    if (Lmax.x === 0 && Lmax.y === 0) {
+      result = diffX === 0 && diffY === 0;
+    } else if (Lmax.x === 0) {
+      result = diffX === 0 && ((diffY >= 0 && Lmax.y >= 0) || (diffY < 0 && Lmax.y < 0));
     } else if (Lmax.y === 0) {
-      result = diffY === 0;
+      result = diffY === 0 && ((diffX > 0 && Lmax.x > 0) || (diffX < 0 && Lmax.x < 0));
     } else {
-      result = Number.isInteger((Lmax.y * diffX) / (Lmax.x * diffY));
+      const ratio = (Lmax.y * diffX) / (Lmax.x * diffY);
+      result =
+        Math.abs(Math.round(ratio) - ratio) <= 0.0001 &&
+        ((diffX > 0 && Lmax.x > 0) || (diffX < 0 && Lmax.x < 0)) &&
+        ((diffY > 0 && Lmax.y > 0) || (diffY < 0 && Lmax.y < 0));
     }
 
     if (result) {

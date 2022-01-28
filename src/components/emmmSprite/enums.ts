@@ -6,6 +6,7 @@ enum iconNames {
   question = 'question',
   save = 'save',
   success = 'success',
+  curlyBrace = 'curly-brace',
 }
 
 export { iconNames };

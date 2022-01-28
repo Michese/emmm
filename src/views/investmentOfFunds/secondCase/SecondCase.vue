@@ -204,9 +204,17 @@ export default class SecondCase extends Vue {
     color: var(--gray-color);
     cursor: pointer;
 
+    &:hover,
+    &:focus {
+      box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+      color: rgba(0, 0, 0, 1);
+    }
+
     &:disabled {
       background-color: var(--turquoise-color);
+      box-shadow: none;
       cursor: default;
+      color: var(--gray-color);
     }
 
     &.checked {

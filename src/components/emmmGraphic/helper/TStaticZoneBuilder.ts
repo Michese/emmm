@@ -59,9 +59,17 @@ class TStaticZoneBuilder {
         return TLine.intersectionPoint(firstLine, secondLine);
       }),
     );
-
     const filteredPoints: TPoint[] = points.filter(point => point && allLines.every(line => line.checkPoint(point))) as TPoint[];
+    return filteredPoints;
+  }
 
+  static pointsOfAreaForRedistributionOfFunds(allLines: TLine[]): TPoint[] {
+    const points: (TPoint | null)[] = allLines.flatMap((firstLine, index) =>
+      allLines.slice(index + 1, allLines.length).map(secondLine => {
+        return TLine.intersectionPoint(firstLine, secondLine);
+      }),
+    );
+    const filteredPoints: TPoint[] = points.filter(point => point && allLines.every(line => line.checkPoint(point))) as TPoint[];
     return filteredPoints;
   }
 }
