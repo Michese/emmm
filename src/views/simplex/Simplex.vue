@@ -18,7 +18,7 @@
       />
       <template v-if="simplex?.simplexTable">
         <simplex-table
-          :is-current-step="simplex?.simplexTable.length - 1 === indexTable && !this.simplex.showResult"
+          :is-current-step="simplex?.simplexTable.length - 1 === indexTable && !this.simplex.answer"
           :previous-table="indexTable > 0 && !simplexTable.isInteger ? simplex?.simplexTable[indexTable - 1] : undefined"
           v-for="(simplexTable, indexTable) in simplex.simplexTable"
           :key="`simplex-table_${indexTable}`"
@@ -29,6 +29,7 @@
           class="simplex__section"
         />
       </template>
+      <answer v-if="simplex?.answer" :answer="simplex.answer" :is-current-step="!simplex.showResult" @apply="answerApply" @back="answerBack" />
       <emmm-result-section v-if="simplex?.showResult" :errors="simplex.countErrors" @back="resultBack" />
       <emmm-save-file-modal ref="saveFileModal" />
     </section>
@@ -52,13 +53,15 @@ import {
   initialElement,
   initialSimplexTableRows,
   initialIntegerSimplexTable,
+  initialAnswer,
 } from '@/views/simplex/component';
 import { InjectReactive, Watch } from 'vue-property-decorator';
 import { Fraction } from '@/class';
+import Answer from '@/views/simplex/answer/Answer.vue';
 
 @Options({
   name: 'Simplex',
-  components: { EmmmIcon, Initial, SimplexTable, EmmmButton, EmmmSaveFileModal, EmmmResultSection },
+  components: { EmmmIcon, Initial, SimplexTable, EmmmButton, EmmmSaveFileModal, EmmmResultSection, Answer },
 })
 export default class Simplex extends Vue {
   declare $refs: {
@@ -90,7 +93,8 @@ export default class Simplex extends Vue {
       simplexTable.cells.slice(2, simplexTable.cells.length).every(row => row[1].value?.top && new Fraction(row[1].value).valueOf() >= 0) &&
       simplexTable.cells[1].slice(2, simplexTable.cells.length).every(cell => cell.value?.top && new Fraction(cell.value).valueOf() <= 0)
     ) {
-      this.simplex!.showResult = true;
+      this.simplex!.answer = initialAnswer(simplexTable.cells[0].length - 2, simplexTable.cells.length - 2);
+      this.toDown();
     } else if (simplexTable.element) {
       if (
         simplexTable.element!.column! < 2 ||
@@ -233,7 +237,7 @@ export default class Simplex extends Vue {
           optimalPlanFound &&
           (simplexTable.cells.slice(2, simplexTable.cells.length).every(row => row[1].value!.bottom === 1) || simplexTable.element)
         ) {
-          this.simplex!.showResult = true;
+          this.simplex!.answer = initialAnswer(simplexTable.cells[0].length - 2, simplexTable.cells.length - 2);
           this.toDown();
         } else {
           simplexTable.element = initialElement();
@@ -272,6 +276,75 @@ export default class Simplex extends Vue {
     } else {
       simplexTables.pop();
     }
+  }
+
+  answerApply(): void {
+    let errorMessage = '';
+
+    const simplexTables = this.simplex!.simplexTable!,
+      simplexTable = simplexTables[simplexTables.length - 1],
+      { x, y, Lmin } = this.simplex!.answer!;
+
+    if (Lmin.value!.top !== simplexTable.cells[1][1].value!.top || Lmin.value!.bottom !== simplexTable.cells[1][1].value!.bottom) {
+      errorMessage = 'Ошибка!';
+      Lmin.value = null;
+    }
+
+    simplexTable.cells.slice(2, simplexTable.cells.length).forEach((row, rowIndex) => {
+      const match = row[0].constValue!.match(/(?<index>\d+)/iu);
+      if (match?.groups?.index) {
+        const index = +match.groups.index - 1;
+
+        if (new RegExp('x', 'igu').test(row[0].constValue!)) {
+          if (
+            x[index].value!.top !== simplexTable.cells[rowIndex + 2][1].value!.top ||
+            x[index].value!.bottom !== simplexTable.cells[rowIndex + 2][1].value!.bottom
+          ) {
+            errorMessage = 'Ошибка!';
+            x[index].value = null;
+          }
+        } else {
+          if (
+            y[index].value!.top !== simplexTable.cells[rowIndex + 2][1].value!.top ||
+            y[index].value!.bottom !== simplexTable.cells[rowIndex + 2][1].value!.bottom
+          ) {
+            errorMessage = 'Ошибка!';
+            y[index].value = null;
+          }
+        }
+      } else throw new Error('Ошибка!');
+    });
+
+    simplexTable.cells[0].slice(2, simplexTable.cells[0].length).forEach((cell, columnIndex) => {
+      const match = cell.constValue!.match(/(?<index>\d+)/iu);
+      if (match?.groups?.index) {
+        const index = +match.groups.index - 1;
+
+        if (new RegExp('x', 'igu').test(cell.constValue!)) {
+          if (+x[index].value!.top !== 0 || x[index].value!.bottom !== 1) {
+            errorMessage = 'Ошибка!';
+            x[index].value = null;
+          }
+        } else {
+          if (+y[index].value!.top !== 0 || y[index].value!.bottom !== 1) {
+            errorMessage = 'Ошибка!';
+            y[index].value = null;
+          }
+        }
+      } else throw new Error('Ошибка!');
+    });
+
+    if (errorMessage) {
+      if (this.openErrorModal) this.openErrorModal(errorMessage);
+      this.simplex!.countErrors++;
+    } else {
+      this.simplex!.showResult = true;
+      this.toDown();
+    }
+  }
+
+  answerBack(): void {
+    this.simplex!.answer = null;
   }
 
   resultBack(): void {

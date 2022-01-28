@@ -1,5 +1,4 @@
-import { tSimplexTable, tSimplexTableCell } from "@/views/simplex/component";
-import { TPreparedFraction } from "@/class";
+import { tSimplexTable, tSimplexTableCell } from '@/views/simplex/component';
 
 type tCoefficient = {
   t: number | null;

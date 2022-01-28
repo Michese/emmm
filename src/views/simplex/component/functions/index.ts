@@ -5,3 +5,4 @@ export * from './initialIntegerSimplexTable';
 export * from './initialSimplexTable';
 export * from './initialSimplexTableWithPrevious';
 export * from './generatorCells';
+export * from './initialAnswer';

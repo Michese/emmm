@@ -3,6 +3,7 @@ import { colorEnum } from '@/components';
 type tMethodOfPotentials = {
   parameters: tParameters;
   potentialTables: tPotentialTable[] | null;
+  answer: tAnswer | null;
   countErrors: number;
   showResult: boolean;
 };
@@ -31,4 +32,8 @@ type tParameters = {
   columns: number | null;
 };
 
-export { tMethodOfPotentials, tPotentialTable, tPotentialTableCell, tParameters, tPath };
+type tAnswer = {
+  Lmin: number | null;
+};
+
+export { tMethodOfPotentials, tPotentialTable, tPotentialTableCell, tParameters, tPath, tAnswer };

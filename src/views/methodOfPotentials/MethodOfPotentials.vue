@@ -29,6 +29,15 @@
       />
     </template>
     <div class="container">
+      <answer
+        v-if="methodOfPotentials?.answer"
+        :is-current-step="!methodOfPotentials?.showResult"
+        :answer="methodOfPotentials.answer"
+        @apply="answerApply"
+        @back="answerBack"
+        class="method-of-potentials__section"
+      />
+
       <emmm-result-section v-if="methodOfPotentials?.showResult" :errors="methodOfPotentials.countErrors" @back="resultBack" />
     </div>
     <a href="#footer" ref="linkFooter" tabindex="-1" />
@@ -42,15 +51,22 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import { tMethodOfPotentials, initialPotentialTable, initialMethodOfPotentials, initialNextTable } from '@/views/methodOfPotentials/component';
+import {
+  tMethodOfPotentials,
+  initialPotentialTable,
+  initialMethodOfPotentials,
+  initialNextTable,
+  initialAnswer,
+} from '@/views/methodOfPotentials/component';
 import { colorEnum, EmmmButton, EmmmIcon, EmmmSaveFileModal, EmmmResultSection } from '@/components';
 import { InjectReactive, Watch } from 'vue-property-decorator';
 import Initial from '@/views/methodOfPotentials/initial/Initial.vue';
 import PotentialTable from '@/views/methodOfPotentials/potentialTable/PotentialTable.vue';
+import Answer from '@/views/methodOfPotentials/answer/Answer.vue';
 
 @Options({
   name: 'MethodOfPotentials',
-  components: { EmmmIcon, EmmmButton, EmmmSaveFileModal, Initial, PotentialTable, EmmmResultSection },
+  components: { EmmmIcon, EmmmButton, EmmmSaveFileModal, Initial, PotentialTable, EmmmResultSection, Answer },
 })
 export default class MethodOfPotentials extends Vue {
   declare $refs: {
@@ -232,7 +248,7 @@ export default class MethodOfPotentials extends Vue {
       if (!errorMessage) {
         if (isEnd) {
           potentialTable.step = 6;
-          this.methodOfPotentials!.showResult = true;
+          this.methodOfPotentials!.answer = initialAnswer();
           this.toDown();
         } else {
           potentialTable.step++;
@@ -323,8 +339,36 @@ export default class MethodOfPotentials extends Vue {
     }
   }
 
-  resultBack(): void {
+  answerApply(): void {
+    let errorMessage = '';
+    const potentialTables = this.methodOfPotentials!.potentialTables!,
+      potentialTable = potentialTables[potentialTables.length - 1],
+      Lmin = potentialTable.cells.reduce(
+        (totalRow, row) =>
+          totalRow + row.reduce((totalCell, cell) => (cell.value && cell.right ? totalCell + cell.value * cell.left!.value! : totalCell), 0),
+        0,
+      );
+
+    if (Math.abs(Lmin - this.methodOfPotentials!.answer!.Lmin!) >= 0.001) {
+      this.methodOfPotentials!.answer!.Lmin = null;
+      errorMessage = 'Ошибка!';
+    }
+
+    if (errorMessage) {
+      if (this.openErrorModal) this.openErrorModal(errorMessage);
+      this.methodOfPotentials!.countErrors++;
+    } else {
+      this.methodOfPotentials!.showResult = true;
+      this.toDown();
+    }
+  }
+
+  answerBack(): void {
     this.methodOfPotentials!.potentialTables![this.methodOfPotentials!.potentialTables!.length - 1].step = 3;
+    this.methodOfPotentials!.answer = null;
+  }
+
+  resultBack(): void {
     this.methodOfPotentials!.showResult = false;
   }
 

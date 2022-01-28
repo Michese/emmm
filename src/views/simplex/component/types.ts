@@ -32,7 +32,9 @@ type tSimplexTable = {
 };
 
 type tAnswer = {
-  //
+  Lmin: tSimplexTableCell;
+  x: tSimplexTableCell[];
+  y: tSimplexTableCell[];
 };
 
 export { tSimplex, tParameters, tSimplexTable, tSimplexTableCell, tElement, tAnswer };

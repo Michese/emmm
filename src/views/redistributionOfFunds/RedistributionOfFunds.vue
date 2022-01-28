@@ -324,12 +324,6 @@ export default class RedistributionOfFunds extends Vue {
 
     const currentValue = vector!.x2 * x2! + vector!.x3 * x3! + coefficient!;
 
-    console.log(
-      TStaticZoneBuilder.pointsOfIntersection(allLines).some(
-        point => allLines.every(line => line.checkPoint(point)) && minValue > point.x * x2! + point.y * x3! + coefficient!,
-      ),
-    );
-
     if (
       Math.abs(currentValue - minValue) > 0.001 &&
       pointsOfArea.length > 0 &&
@@ -360,8 +354,6 @@ export default class RedistributionOfFunds extends Vue {
       answer = this.redistributionOfFunds![numberCase]!.answer!,
       { x2, x3 } = this.redistributionOfFunds![numberCase]!.vector!,
       { minValue } = this[graphicName];
-
-    console.log('minValue', minValue);
 
     if (Math.abs(minValue - answer.t0!) >= 0.001) {
       answer.t0 = null;
