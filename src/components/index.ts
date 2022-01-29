@@ -10,4 +10,5 @@ export * from './emmmUpload';
 export * from './emmmSaveFileModal';
 export * from './emmmErrorModal';
 export * from './emmmResultSection';
+export * from './emmmPopover';
 export * from './enums';

@@ -6,7 +6,7 @@
   </defs>
   <g @mousedown.stop.prevent="onMouseDown">
     <polyline :points="points" :style="vectorStyles" stroke-width="0.4" marker-end="url(#black-arrow)" />
-    <polyline :points="backgroundPoints" fill="transparent" stroke-width="2" />
+    <polyline :points="backgroundPoints" fill="transparent" stroke-width="0.8" />
   </g>
 </template>
 
@@ -149,18 +149,18 @@ export default class EmmmNormalVector extends Vue {
   get backgroundPoints(): string {
     if (!this.startPoint) return ``;
 
-    const moreX = this.vector.x >= this.vector.y,
+    const moreX = Math.abs(this.vector.x) >= Math.abs(this.vector.y),
       { x, y } = this.currentPoint,
       { sizeCellPx } = this.graphicBuilder,
-      ratioVectorX = this.vector.x / this.vector.y,
+      ratioVectorX = Math.abs(this.vector.x / this.vector.y),
       signX = this.vector.x >= 0,
       signY = this.vector.y >= 0;
 
-    return `${x - ((signY ? 1 : -1) * (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)) / 2}
+    return `${x}, ${y} ${x - ((signY ? 1 : -1) * (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)) / 2}
       ${y - ((signX ? 1 : -1) * (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)) / 2}
     ${x + ((signY ? 1 : -1) * (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)) / 2}, ${
       y + ((signX ? 1 : -1) * (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)) / 2
-    } ${x + (signX ? 1 : -1) * (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)},
+    } ${x}, ${y} ${x + (signX ? 1 : -1) * (moreX ? sizeCellPx : sizeCellPx * ratioVectorX)},
     ${y - (signY ? 1 : -1) * (moreX ? sizeCellPx / ratioVectorX : sizeCellPx)}`;
   }
 }

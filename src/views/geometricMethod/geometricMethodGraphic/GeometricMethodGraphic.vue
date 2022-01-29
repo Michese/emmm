@@ -8,6 +8,8 @@
     </span>
 
     <div class="geometric-method-graphic__inner">
+      <emmm-popover :text="textPopover" ref="popover" />
+
       <emmm-graphic
         v-if="graphicBuilder"
         :graphicBuilder="graphicBuilder"
@@ -16,7 +18,26 @@
         class="geometric-method-graphic__emmm-graphic"
       >
         <emmm-zone :points="zonePoints" />
-        <emmm-line v-for="line in lines" :key="line" :line="line" :is-corrugated="true" />
+        <emmm-line
+          v-for="line in lines"
+          :key="line"
+          :line="line"
+          :is-corrugated="true"
+          @mouseenter.prevent="mouseEnterEvent(line.marker, $event)"
+          @mousemove.prevent="mouseEnterEvent(line.marker, $event)"
+          @mouseleave="popover.hiddePopover()"
+          @wheel="popover.hiddePopover()"
+        />
+        <emmm-point
+          v-for="(point, index) in pointsOfArea"
+          :key="`point__${index}`"
+          :point="point"
+          fill="var(--blue-color)"
+          @mouseenter.prevent="mouseEnterEvent(`${+point.x.toFixed(2)}; ${+point.y.toFixed(2)}`, $event)"
+          @mousemove.prevent="mouseEnterEvent(`${+point.x.toFixed(2)}; ${+point.y.toFixed(2)}`, $event)"
+          @mouseleave="popover.hiddePopover()"
+          @wheel="popover.hiddePopover()"
+        />
         <emmm-normal-vector :vector="normalVector.vector" :point="normalVector.point" :canMove="isCurrentStep" @set-point="setVectorPoint" />
       </emmm-graphic>
     </div>
@@ -37,13 +58,14 @@ import {
   EmmmLine,
   EmmmNormalVector,
   EmmmPoint,
+  EmmmPopover,
   EmmmZone,
   GraphicBuilder,
   TLine,
   TPoint,
   TStaticZoneBuilder,
 } from '@/components';
-import { InjectReactive, Prop } from 'vue-property-decorator';
+import { InjectReactive, Prop, Ref } from 'vue-property-decorator';
 import { tCondition, tPointVectorForGraphic } from '@/views/geometricMethod/component/types';
 
 @Options({
@@ -56,10 +78,13 @@ import { tCondition, tPointVectorForGraphic } from '@/views/geometricMethod/comp
     EmmmLine,
     EmmmIcon,
     EmmmButton,
+    EmmmPopover,
   },
   emits: ['apply', 'back'],
 })
 export default class GeometricMethodGraphic extends Vue {
+  @Ref('popover') popover!: Vue & { mouseEnterEvent: (event: MouseEvent) => void; hiddePopover: () => void };
+
   @Prop({
     type: Boolean,
     required: false,
@@ -80,18 +105,6 @@ export default class GeometricMethodGraphic extends Vue {
   condition!: tCondition;
 
   graphicBuilder = new GraphicBuilder().setRangeX(this.startX, this.endX).setRangeY(this.startY, this.endY);
-  // point: TPoint = new TPoint(0, 5);
-
-  get lines(): TLine[] {
-    return [
-      TLine.createLineByPoints(this.startX, 0, this.endX, 0, true),
-      TLine.createLineByPoints(0, this.startY, 0, this.endY, true),
-      ...this.condition.inequalities.map(inequality =>
-        TLine.createLineByEquation(inequality.result! / inequality.y!, -inequality.x! / inequality.y!, this.startX, this.endX, false),
-      ),
-    ];
-  }
-
   normalVector: {
     vector: TPoint;
     point: TPoint;
@@ -99,6 +112,25 @@ export default class GeometricMethodGraphic extends Vue {
     vector: new TPoint(this.condition.Lmax.x!, this.condition.Lmax.y!),
     point: new TPoint(this.pointVectorForGraphic.x!, this.pointVectorForGraphic.y!),
   };
+  zonePoints: TPoint[] = TStaticZoneBuilder.pointsAxis(this.allLines, this.startX, this.endX, this.startY, this.endY);
+  textPopover = '';
+
+  get lines(): TLine[] {
+    return [
+      TLine.createLineByPoints(this.startX, 0, this.endX, 0, true, `y = 0`),
+      TLine.createLineByPoints(0, this.startY, 0, this.endY, true, `x = 0`),
+      ...this.condition.inequalities.map(inequality =>
+        TLine.createLineByEquation(
+          inequality.result! / inequality.y!,
+          -inequality.x! / inequality.y!,
+          this.startX,
+          this.endX,
+          false,
+          `${+inequality.x!.toFixed(2)}x + ${+inequality.y!.toFixed(2)}y = ${+inequality.result!.toFixed(2)}`,
+        ),
+      ),
+    ];
+  }
 
   get allLines(): TLine[] {
     return [
@@ -112,10 +144,6 @@ export default class GeometricMethodGraphic extends Vue {
 
   get pointsOfIntersection(): TPoint[] {
     return TStaticZoneBuilder.pointsOfIntersection(this.lines);
-  }
-
-  perpendicularPoints(point: TPoint): TPoint[] {
-    return this.parallelLines.map(line => line.perpendicularPoint(point));
   }
 
   get parallelLines(): TLine[] {
@@ -165,7 +193,13 @@ export default class GeometricMethodGraphic extends Vue {
     return Math.max(this.maxX, this.maxY) + 5;
   }
 
-  zonePoints: TPoint[] = TStaticZoneBuilder.pointsAxis(this.allLines, this.startX, this.endX, this.startY, this.endY);
+  get maxValue(): number {
+    return Math.max(...this.pointsOfArea.map(point => point.x * this.condition.Lmax.x! + point.y * this.condition.Lmax.y!));
+  }
+
+  perpendicularPoints(point: TPoint): TPoint[] {
+    return this.parallelLines.map(line => line.perpendicularPoint(point));
+  }
 
   setVectorPoint(movePoint: TPoint): void {
     let minDistance = 1,
@@ -184,8 +218,11 @@ export default class GeometricMethodGraphic extends Vue {
     this.pointVectorForGraphic.y = nearestPoint.y;
   }
 
-  get maxValue(): number {
-    return Math.max(...this.pointsOfArea.map(point => point.x * this.condition.Lmax.x! + point.y * this.condition.Lmax.y!));
+  mouseEnterEvent(text: string, event: MouseEvent): void {
+    if (text) {
+      this.textPopover = text;
+      this.popover.mouseEnterEvent(event);
+    }
   }
 
   @InjectReactive('openErrorModal') openErrorModal?: (message: string) => void;

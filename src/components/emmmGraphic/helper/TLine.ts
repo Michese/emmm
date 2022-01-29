@@ -6,14 +6,16 @@ class TLine extends TFigure {
   a0: number;
   a1: number;
   more: boolean;
+  marker: string;
 
-  constructor(firstPoint: TPoint, secondPoint: TPoint, a0 = 0, a1 = 0, more = false) {
+  constructor(firstPoint: TPoint, secondPoint: TPoint, a0 = 0, a1 = 0, more = false, marker = '') {
     super();
     this.firstPoint = firstPoint;
     this.secondPoint = secondPoint;
     this.a0 = a0;
     this.a1 = a1;
     this.more = more;
+    this.marker = marker;
   }
 
   distance(point: TPoint): number {
@@ -49,14 +51,14 @@ class TLine extends TFigure {
     return this;
   }
 
-  static createLineByEquation(a0: number, a1: number, startX: number, endX: number, more = false): TLine {
+  static createLineByEquation(a0: number, a1: number, startX: number, endX: number, more = false, marker = ''): TLine {
     const startY = a0 + a1 * startX,
       endY = a0 + a1 * endX;
-    return new TLine(new TPoint(startX, startY), new TPoint(endX, endY), a0, a1, more);
+    return new TLine(new TPoint(startX, startY), new TPoint(endX, endY), a0, a1, more, marker);
   }
 
-  static createLineByPoints(startX: number, startY: number, endX: number, endY: number, more = false): TLine {
-    return new TLine(new TPoint(startX, startY), new TPoint(endX, endY), 0, 0, more);
+  static createLineByPoints(startX: number, startY: number, endX: number, endY: number, more = false, marker = ''): TLine {
+    return new TLine(new TPoint(startX, startY), new TPoint(endX, endY), 0, 0, more, marker);
   }
 
   static intersectionPoint(firstLine: TLine, secondLine: TLine): TPoint | null {

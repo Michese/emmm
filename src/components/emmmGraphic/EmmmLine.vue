@@ -1,24 +1,26 @@
 <template>
-  <line
-    v-if="showingLine"
-    :x1="firstPointX"
-    :y1="firstPointY"
-    :x2="secondPointX"
-    :y2="secondPointY"
-    :stroke="strokeColor"
-    :stroke-width="strokeWidth"
-  />
-  <line
-    v-if="isCorrugated"
-    :x1="corrugateFirstPointX"
-    :y1="corrugateFirstPointY"
-    :x2="corrugateSecondPointX"
-    :y2="corrugateSecondPointY"
-    :stroke="strokeColor"
-    :stroke-width="corrugateStrokeWidth"
-    stroke-dasharray="0.1 2"
-    stroke-opacity="0.5"
-  />
+  <g>
+    <line
+      v-if="showingLine"
+      :x1="firstPointX"
+      :y1="firstPointY"
+      :x2="secondPointX"
+      :y2="secondPointY"
+      :stroke="strokeColor"
+      :stroke-width="strokeWidth"
+    />
+    <line
+      v-if="isCorrugated"
+      :x1="corrugateFirstPointX"
+      :y1="corrugateFirstPointY"
+      :x2="corrugateSecondPointX"
+      :y2="corrugateSecondPointY"
+      :stroke="strokeColor"
+      :stroke-width="corrugateStrokeWidth"
+      stroke-dasharray="0.1 2"
+      stroke-opacity="0.5"
+    />
+  </g>
 </template>
 
 <script lang="ts">

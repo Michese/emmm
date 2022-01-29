@@ -1,6 +1,5 @@
 <template>
-  <circle v-if="showPoint && showingPoint" :cx="x" :cy="y" :r="r" :stroke-width="strokeWidth" :stroke="strokeColor" :fill="fill" />
-  <text v-if="showPoint && showingPoint && showMark" :x="x" :y="y" :style="markStyles">{{ mark }}</text>
+  <circle v-if="showPoint && showingPoint" :cx="x" :cy="y" :r="r" :stroke-width="strokeWidth" :stroke="strokeColor" :fill="fill" class="circle" />
 </template>
 
 <script lang="ts">
@@ -18,11 +17,10 @@ export default class EmmmPoint extends Vue {
     default: () => 0,
   })
   strokeWidth!: number;
-
   @Prop({
     type: Number,
     required: false,
-    default: () => 0.8,
+    default: () => 0.4,
   })
   r!: number;
 
@@ -97,4 +95,10 @@ export default class EmmmPoint extends Vue {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.circle {
+  &:hover + .text {
+    display: inline;
+  }
+}
+</style>
