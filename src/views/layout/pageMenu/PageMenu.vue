@@ -20,7 +20,7 @@ import { InjectReactive, Watch } from 'vue-property-decorator';
 import { Component } from 'vue';
 import { tMenuItem, tMenuItems } from '@/types';
 import { routerNameEnum } from '@/enums';
-import { EmmmIcon, iconNames } from '@/components';
+import { EmmmIcon } from '@/components';
 @Options({
   name: 'PageMenu',
   components: { EmmmIcon },

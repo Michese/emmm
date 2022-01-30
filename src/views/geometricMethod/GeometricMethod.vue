@@ -84,6 +84,7 @@ import { InjectReactive, Watch } from 'vue-property-decorator';
 import GeometricMethodGraphic from '@/views/geometricMethod/geometricMethodGraphic/GeometricMethodGraphic.vue';
 import BuildingVector from '@/views/geometricMethod/buildingVector/BuildingVector.vue';
 import Answer from '@/views/geometricMethod/answer/Answer.vue';
+import { abs } from '@/helper';
 
 @Options({
   name: 'GeometricMethod',
@@ -123,15 +124,15 @@ export default class GeometricMethod extends Vue {
       condition: { Lmax, inequalities },
     } = this.geometricMethod!;
 
-    if (Lmax.x === 0 && Lmax.y === 0) {
+    if (abs(Lmax.x!) <= 0.001 && abs(Lmax.y!) <= 0.001) {
       Lmax.x = null;
       Lmax.y = null;
       errorMessage = 'Введены недопустимые значения!';
     }
 
-    if (inequalities.some(inequality => inequality.x === 0 && inequality.y === 0)) {
+    if (inequalities.some(inequality => abs(inequality.x!) <= 0.001 && abs(inequality.y!) <= 0.001)) {
       inequalities.forEach(inequality => {
-        if (inequality.x === 0 && inequality.y === 0) {
+        if (abs(inequality.x!) <= 0.001 && abs(inequality.y!) <= 0.001) {
           inequality.x = null;
           inequality.y = null;
         }
@@ -152,27 +153,18 @@ export default class GeometricMethod extends Vue {
       pointsForLines,
       condition: { inequalities },
     } = this.geometricMethod!;
-    if (!pointsForLines) return;
-    if (!inequalities) return;
 
     let errorMessage = '';
     inequalities.forEach((inequality, index) => {
-      pointsForLines[index].lines.forEach((point, indexPoint) => {
-        if (
-          !(
-            inequality.x !== null &&
-            inequality.y !== null &&
-            inequality.result !== null &&
-            point.x !== null &&
-            point.y !== null &&
-            Math.abs(inequality.x * point.x + inequality.y * point.y - inequality.result) <= 0.0001
-          )
-        ) {
+      pointsForLines![index].lines.forEach((point, indexPoint) => {
+        if (abs(inequality.x! * point.x! + inequality.y! * point.y! - inequality.result!) >= 0.0001) {
           point.x = null;
           point.y = null;
           errorMessage = 'Не все точки лежат на прямых!';
           this.geometricMethod!.countErrors++;
-        } else if (pointsForLines[index].lines.slice(indexPoint + 1).some(point2 => point.x === point2.x && point.y === point2.y)) {
+        } else if (
+          pointsForLines![index].lines.slice(indexPoint + 1).some(point2 => abs(point.x! - point2.x!) <= 0.001 && abs(point.y! - point2.y!) <= 0.001)
+        ) {
           point.x = null;
           point.y = null;
           errorMessage = 'Построение прямой по одной точке невозможно!';
@@ -192,29 +184,28 @@ export default class GeometricMethod extends Vue {
 
   buildingVectorApply(): void {
     const {
-      pointsForVector,
-      condition: { Lmax },
-    } = this.geometricMethod!;
-    if (!pointsForVector || Lmax.x === null || Lmax.y === null) return;
-    const { lines } = pointsForVector;
+        pointsForVector,
+        condition: { Lmax },
+      } = this.geometricMethod!,
+      { lines } = pointsForVector!;
 
     const diffY = lines[1].y! - lines[0].y!,
       diffX = lines[1].x! - lines[0].x!;
 
     let result;
 
-    if (Lmax.x === 0 && Lmax.y === 0) {
-      result = diffX === 0 && diffY === 0;
-    } else if (Lmax.x === 0) {
-      result = diffX === 0 && ((diffY >= 0 && Lmax.y >= 0) || (diffY < 0 && Lmax.y < 0));
-    } else if (Lmax.y === 0) {
-      result = diffY === 0 && ((diffX > 0 && Lmax.x > 0) || (diffX < 0 && Lmax.x < 0));
+    if (abs(Lmax.x!) <= 0.001 && abs(Lmax.y!) <= 0.001) {
+      result = abs(diffX) <= 0.001 && abs(diffY) <= 0.001;
+    } else if (abs(Lmax.x!) <= 0.001) {
+      result = abs(diffX) <= 0.001 && ((diffY >= 0 && Lmax.y! >= 0) || (diffY < 0 && Lmax.y! < 0));
+    } else if (abs(Lmax.y!) <= 0.001) {
+      result = abs(diffY) <= 0.001 && ((diffX > 0 && Lmax.x! > 0) || (diffX < 0 && Lmax.x! < 0));
     } else {
-      const ratio = (Lmax.y * diffX) / (Lmax.x * diffY);
+      const ratio = (Lmax.y! * diffX) / (Lmax.x! * diffY);
       result =
-        Math.abs(Math.round(ratio) - ratio) <= 0.0001 &&
-        ((diffX > 0 && Lmax.x > 0) || (diffX < 0 && Lmax.x < 0)) &&
-        ((diffY > 0 && Lmax.y > 0) || (diffY < 0 && Lmax.y < 0));
+        abs(Math.round(ratio) - ratio) <= 0.0001 &&
+        ((diffX > 0 && Lmax.x! > 0) || (diffX < 0 && Lmax.x! < 0)) &&
+        ((diffY > 0 && Lmax.y! > 0) || (diffY < 0 && Lmax.y! < 0));
     }
 
     if (result) {
@@ -243,7 +234,7 @@ export default class GeometricMethod extends Vue {
 
     const currentValue = pointVectorForGraphic!.x * Lmax.x! + pointVectorForGraphic!.y * Lmax.y!;
     if (
-      Math.abs(currentValue - maxValue) <= 0.001 ||
+      abs(currentValue - maxValue) <= 0.001 ||
       pointsOfArea.length === 0 ||
       TStaticZoneBuilder.pointsOfIntersection(allLines).some(
         point => allLines.every(line => line.checkPoint(point)) && maxValue < point.x * Lmax.x! + point.y * Lmax.y!,
@@ -285,7 +276,7 @@ export default class GeometricMethod extends Vue {
               Lmax: { x, y },
             },
           } = this.geometricMethod!;
-        const filteredPoints = pointsOfArea.filter(point => Math.abs(point.x * x! + point.y * y! - maxValue) <= 0.001);
+        const filteredPoints = pointsOfArea.filter(point => abs(point.x * x! + point.y * y! - maxValue) <= 0.001);
         if (filteredPoints.length >= 2) {
           errorMessage = 'Ответ неверный!';
         }
@@ -302,8 +293,8 @@ export default class GeometricMethod extends Vue {
       switch (this.geometricMethod!.answer!.radio) {
         case radioAnswerEnum.point:
           if (
-            Math.abs(this.geometricMethod!.pointVectorForGraphic!.x - this.geometricMethod!.answer!.points[0].x!) > 0.001 ||
-            Math.abs(this.geometricMethod!.pointVectorForGraphic!.y - this.geometricMethod!.answer!.points[0].y!) > 0.001
+            abs(this.geometricMethod!.pointVectorForGraphic!.x - this.geometricMethod!.answer!.points[0].x!) >= 0.001 ||
+            abs(this.geometricMethod!.pointVectorForGraphic!.y - this.geometricMethod!.answer!.points[0].y!) >= 0.001
           ) {
             this.geometricMethod!.answer!.points.forEach(point => {
               point!.x = null;
@@ -312,7 +303,7 @@ export default class GeometricMethod extends Vue {
             errorMessage = 'Ответ неверный!';
           }
 
-          if (Math.abs(this.$refs.graphic.maxValue - this.geometricMethod!.answer!.Lmax!) > 0.001) {
+          if (abs(this.$refs.graphic.maxValue - this.geometricMethod!.answer!.Lmax!) >= 0.001) {
             this.geometricMethod!.answer!.Lmax = null;
             errorMessage = 'Ответ неверный!';
           }
@@ -326,17 +317,17 @@ export default class GeometricMethod extends Vue {
                   Lmax: { x, y },
                 },
               } = this.geometricMethod!;
-            const filteredPoints = pointsOfArea.filter(point => Math.abs(point.x * x! + point.y * y! - maxValue) <= 0.001);
+            const filteredPoints = pointsOfArea.filter(point => abs(point.x * x! + point.y * y! - maxValue) <= 0.001);
             if (
               filteredPoints.length !== 2 ||
-              ((Math.abs(filteredPoints[0].x - answer!.points[0].x!) > 0.001 ||
-                Math.abs(filteredPoints[1].x - answer!.points[1].x!) > 0.001 ||
-                Math.abs(filteredPoints[0].y - answer!.points[0].y!) > 0.001 ||
-                Math.abs(filteredPoints[1].y - answer!.points[1].y!) > 0.001) &&
-                (Math.abs(filteredPoints[0].x - answer!.points[1].x!) > 0.001 ||
-                  Math.abs(filteredPoints[1].x - answer!.points[0].x!) > 0.001 ||
-                  Math.abs(filteredPoints[0].y - answer!.points[1].y!) > 0.001 ||
-                  Math.abs(filteredPoints[1].y - answer!.points[0].y!) > 0.001))
+              ((abs(filteredPoints[0].x - answer!.points[0].x!) >= 0.001 ||
+                abs(filteredPoints[1].x - answer!.points[1].x!) >= 0.001 ||
+                abs(filteredPoints[0].y - answer!.points[0].y!) >= 0.001 ||
+                abs(filteredPoints[1].y - answer!.points[1].y!) >= 0.001) &&
+                (abs(filteredPoints[0].x - answer!.points[1].x!) >= 0.001 ||
+                  abs(filteredPoints[1].x - answer!.points[0].x!) >= 0.001 ||
+                  abs(filteredPoints[0].y - answer!.points[1].y!) >= 0.001 ||
+                  abs(filteredPoints[1].y - answer!.points[0].y!) >= 0.001))
             ) {
               this.geometricMethod!.answer!.points.forEach(point => {
                 point!.x = null;
@@ -345,7 +336,7 @@ export default class GeometricMethod extends Vue {
               errorMessage = 'Ответ неверный!';
             }
 
-            if (Math.abs(answer!.Lmax! - maxValue) > 0.001) {
+            if (abs(answer!.Lmax! - maxValue) > 0.001) {
               this.geometricMethod!.answer!.Lmax = null;
               errorMessage = 'Ответ неверный!';
             }
@@ -395,15 +386,15 @@ export default class GeometricMethod extends Vue {
     this.$refs.linkFooter.click();
   }
 
+  saveFile(): void {
+    const geometricMethodJSON = JSON.stringify(this.geometricMethod);
+    this.$refs.saveFileModal.showModal(geometricMethodJSON);
+  }
+
   created(): void {
     const geometricMethodJSON = sessionStorage.getItem('geometricMethod');
     if (geometricMethodJSON) this.geometricMethod = JSON.parse(geometricMethodJSON) as tGeometricMethod;
     else this.fullReset();
-  }
-
-  saveFile(): void {
-    const geometricMethodJSON = JSON.stringify(this.geometricMethod);
-    this.$refs.saveFileModal.showModal(geometricMethodJSON);
   }
 
   @InjectReactive('openErrorModal') openErrorModal?: (message: string) => void;

@@ -131,6 +131,7 @@ import Vector from '@/views/redistributionOfFunds/vector/Vector.vue';
 import Graphic from '@/views/redistributionOfFunds/graphic/Graphic.vue';
 import Answer from '@/views/redistributionOfFunds/answer/Answer.vue';
 import System from '@/views/redistributionOfFunds/system/System.vue';
+import { abs } from '@/helper';
 
 @Options({
   name: 'RedistributionOfFunds',
@@ -184,63 +185,63 @@ export default class RedistributionOfFunds extends Vue {
       system = this.redistributionOfFunds![numberCase]!.system;
 
     if (numberCase === 'firstCase') {
-      if (Math.abs(system.t.coefficient! - t1! - t3!) >= 0.0001) {
+      if (abs(system.t.coefficient! - t1! - t3!) >= 0.0001) {
         system.t.coefficient = null;
         errorMessage = 'Ошибка!';
       }
 
-      if (Math.abs(system.t.x2! - t1! * a1!) >= 0.0001) {
+      if (abs(system.t.x2! - t1! * a1!) >= 0.0001) {
         system.t.x2 = null;
         errorMessage = 'Ошибка!';
       }
 
-      if (Math.abs(system.t.x3! - t1! * a1! + t3! * a3!) >= 0.0001) {
+      if (abs(system.t.x3! - t1! * a1! + t3! * a3!) >= 0.0001) {
         system.t.x3 = null;
         errorMessage = 'Ошибка!';
       }
     } else {
-      if (Math.abs(system.t.coefficient! - t2! - t3!) >= 0.0001) {
+      if (abs(system.t.coefficient! - t2! - t3!) >= 0.0001) {
         system.t.coefficient = null;
         errorMessage = 'Ошибка!';
       }
 
-      if (Math.abs(system.t.x2! + t2! * a2!) >= 0.0001) {
+      if (abs(system.t.x2! + t2! * a2!) >= 0.0001) {
         system.t.x2 = null;
         errorMessage = 'Ошибка!';
       }
 
-      if (Math.abs(system.t.x3! + t3! * a3!) >= 0.0001) {
+      if (abs(system.t.x3! + t3! * a3!) >= 0.0001) {
         system.t.x3 = null;
         errorMessage = 'Ошибка!';
       }
     }
 
-    if (Math.abs(system.first.x2! - t1! * a1! - t2! * a2!) >= 0.0001) {
+    if (abs(system.first.x2! - t1! * a1! - t2! * a2!) >= 0.0001) {
       system.first.x2 = null;
       errorMessage = 'Ошибка!';
     }
 
-    if (Math.abs(system.first.x3! - t1! * a1!) >= 0.0001) {
+    if (abs(system.first.x3! - t1! * a1!) >= 0.0001) {
       system.first.x3 = null;
       errorMessage = 'Ошибка!';
     }
 
-    if (Math.abs(t1! - t2! + system.first.coefficient!) >= 0.0001) {
+    if (abs(t1! - t2! + system.first.coefficient!) >= 0.0001) {
       system.first.coefficient = null;
       errorMessage = 'Ошибка!';
     }
 
-    if (Math.abs(system.second! - x1!) >= 0.0001) {
+    if (abs(system.second! - x1!) >= 0.0001) {
       system.second = null;
       errorMessage = 'Ошибка!';
     }
 
-    if (Math.abs(system.third! - x2!) >= 0.0001) {
+    if (abs(system.third! - x2!) >= 0.0001) {
       system.third = null;
       errorMessage = 'Ошибка!';
     }
 
-    if (Math.abs(system.fourth! - x3!) >= 0.0001) {
+    if (abs(system.fourth! - x3!) >= 0.0001) {
       system.fourth = null;
       errorMessage = 'Ошибка!';
     }
@@ -265,23 +266,23 @@ export default class RedistributionOfFunds extends Vue {
 
     let result;
 
-    if (this.redistributionOfFunds![numberCase]!.system.t.x2! === 0 && this.redistributionOfFunds![numberCase]!.system.t.x3! === 0) {
-      result = diffX2 === 0 && diffX3 === 0;
-    } else if (this.redistributionOfFunds![numberCase]!.system.t.x2! === 0) {
+    if (abs(this.redistributionOfFunds![numberCase]!.system.t.x2!) <= 0.001 && abs(this.redistributionOfFunds![numberCase]!.system.t.x3!) <= 0.001) {
+      result = abs(diffX2) <= 0.001 && abs(diffX3) <= 0.001;
+    } else if (abs(this.redistributionOfFunds![numberCase]!.system.t.x2!) <= 0.001) {
       result =
-        diffX2 === 0 &&
+        abs(diffX2) <= 0.001 &&
         ((diffX3 > 0 && this.redistributionOfFunds![numberCase]!.system.t.x3! < 0) ||
           (diffX3 < 0 && this.redistributionOfFunds![numberCase]!.system.t.x3! > 0));
-    } else if (this.redistributionOfFunds![numberCase]!.system.t.x3! === 0) {
+    } else if (abs(this.redistributionOfFunds![numberCase]!.system.t.x3!) <= 0.001) {
       result =
-        diffX3 === 0 &&
+        abs(diffX3) <= 0.001 &&
         ((diffX2 > 0 && this.redistributionOfFunds![numberCase]!.system.t.x2! < 0) ||
           (diffX2 < 0 && this.redistributionOfFunds![numberCase]!.system.t.x2! > 0));
     } else {
       const ratio =
         (this.redistributionOfFunds![numberCase]!.system.t.x3! * diffX2) / (this.redistributionOfFunds![numberCase]!.system.t.x2! * diffX3);
       result =
-        Math.abs(Math.round(ratio) - ratio) <= 0.0001 &&
+        abs(Math.round(ratio) - ratio) <= 0.0001 &&
         ((diffX2 > 0 && this.redistributionOfFunds![numberCase]!.system.t.x2! < 0) ||
           (diffX2 < 0 && this.redistributionOfFunds![numberCase]!.system.t.x2! > 0)) &&
         ((diffX3 > 0 && this.redistributionOfFunds![numberCase]!.system.t.x3! < 0) ||
@@ -325,7 +326,7 @@ export default class RedistributionOfFunds extends Vue {
     const currentValue = vector!.x2 * x2! + vector!.x3 * x3! + coefficient!;
 
     if (
-      Math.abs(currentValue - minValue) > 0.001 &&
+      abs(currentValue - minValue) >= 0.001 &&
       pointsOfArea.length > 0 &&
       !TStaticZoneBuilder.pointsOfIntersection(allLines).some(
         point => allLines.every(line => line.checkPoint(point)) && minValue > point.x * x2! + point.y * x3! + coefficient!,
@@ -355,17 +356,17 @@ export default class RedistributionOfFunds extends Vue {
       { x2, x3 } = this.redistributionOfFunds![numberCase]!.vector!,
       { minValue } = this[graphicName];
 
-    if (Math.abs(minValue - answer.t0!) >= 0.001) {
+    if (abs(minValue - answer.t0!) >= 0.001) {
       answer.t0 = null;
       errorMessage = 'Неверный ответ!';
     }
 
-    if (Math.abs(x2 - answer.x2!) >= 0.001) {
+    if (abs(x2 - answer.x2!) >= 0.001) {
       answer.x2 = null;
       errorMessage = 'Неверный ответ!';
     }
 
-    if (Math.abs(x3 - answer.x3!) >= 0.001) {
+    if (abs(x3 - answer.x3!) >= 0.001) {
       answer.x3 = null;
       errorMessage = 'Неверный ответ!';
     }

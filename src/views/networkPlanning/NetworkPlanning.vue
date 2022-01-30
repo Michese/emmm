@@ -88,6 +88,7 @@ import NewNetworkTable from '@/views/networkPlanning/newNetworkTable/NewNetworkT
 import CreatorPath from '@/views/networkPlanning/creatorPath/CreatorPath.vue';
 import { initialOldPath } from '@/views/networkPlanning/component/functions/initialOldPath';
 import Answer from '@/views/networkPlanning/answer/Answer.vue';
+import { abs } from '@/helper';
 
 @Options({
   name: 'NetworkPlanning',
@@ -137,7 +138,7 @@ export default class NetworkPlanning extends Vue {
       ? this.networkPlanning.oldWorks
           .map((work, index) => ({ oldDesignation: index, ...work }))
           .sort((left, right) =>
-            left.designation!.value === right.designation!.value
+            abs(left.designation!.value! - right.designation!.value!) <= 0.001
               ? 0
               : left.designation!.value === null
               ? 1
@@ -160,7 +161,7 @@ export default class NetworkPlanning extends Vue {
     if (
       this.sortedDesignations.some((firstWork, index) =>
         this.sortedDesignations.slice(index + 1, this.sortedDesignations.length).some(secondWork => {
-          const result = firstWork.designation!.value === secondWork.designation!.value;
+          const result = abs(firstWork.designation!.value! - secondWork.designation!.value!) <= 0.001;
           if (result) {
             firstWork.designation!.borderColor = colorEnum.orange;
             secondWork.designation!.borderColor = colorEnum.orange;
@@ -200,11 +201,13 @@ export default class NetworkPlanning extends Vue {
 
     this.networkPlanning!.newWorks!.forEach(newWork => {
       if (
-        newWork.totalTime.value !==
-        Math.max(
-          ...newWork.reliesOn.map(relyOn => (relyOn.value === null ? 0 : this.networkPlanning!.newWorks![relyOn.value! - 1].totalTime.value!)),
-        ) +
-          newWork.time.value!
+        abs(
+          newWork.totalTime.value! -
+            Math.max(
+              ...newWork.reliesOn.map(relyOn => (relyOn.value === null ? 0 : this.networkPlanning!.newWorks![relyOn.value! - 1].totalTime.value!)),
+            ) -
+            newWork.time.value!,
+        ) >= 0.001
       ) {
         newWork.totalTime.value = null;
         newWork.totalTime.borderColor = colorEnum.orange;
@@ -234,21 +237,21 @@ export default class NetworkPlanning extends Vue {
 
     const works = this.networkPlanning!.newWorks!,
       criticalTime = Math.max(...works.map(work => work.totalTime.value!)),
-      criticalCount = works.map(work => work.totalTime.value!).filter(totalTime => totalTime === criticalTime).length;
+      criticalCount = works.map(work => work.totalTime.value!).filter(totalTime => abs(totalTime - criticalTime) <= 0.001).length;
 
     function checkChildsPath(childs: tPath[], criticalTime: number, criticalCount: number): boolean {
-      if (childs.length === criticalCount && criticalCount === 0) return true;
+      if (abs(childs.length - criticalCount) <= 0.001 && abs(criticalCount) <= 0.001) return true;
 
-      if (childs.some(child => works[child.value! - 1].totalTime.value! !== criticalTime)) {
+      if (childs.some(child => abs(works[child.value! - 1].totalTime.value! - criticalTime) >= 0.001)) {
         childs.forEach(child => {
-          if (works[child.value! - 1].totalTime.value! !== criticalTime) {
+          if (abs(works[child.value! - 1].totalTime.value! - criticalTime) >= 0.001) {
             child.borderColor = colorEnum.orange;
             child.value = null;
             errorMessage = 'Неверно выбрано критическое время!';
           }
         });
         return false;
-      } else if (childs.length !== criticalCount) {
+      } else if (abs(childs.length - criticalCount) >= 0.001) {
         childs.forEach(child => (child.borderColor = colorEnum.orange));
         errorMessage = 'Неверно выбрано критическое время!';
         return false;
@@ -258,7 +261,7 @@ export default class NetworkPlanning extends Vue {
         const critTime = Math.max(...works[child.value! - 1].reliesOn.map(ralyOn => (ralyOn.value ? works[ralyOn.value - 1].totalTime.value! : 0))),
           critCount = works[child.value! - 1].reliesOn
             .map(ralyOn => (ralyOn.value ? works[ralyOn.value - 1].totalTime.value! : null))
-            .filter(totalTime => totalTime !== null && totalTime === critTime).length;
+            .filter(totalTime => totalTime !== null && abs(totalTime - critTime) <= 0.001).length;
 
         return checkChildsPath(child.childs, critTime, critCount);
       });
@@ -281,7 +284,7 @@ export default class NetworkPlanning extends Vue {
     const works = this.networkPlanning!.newWorks!,
       criticalTime = Math.max(...works.map(work => work.totalTime.value!));
 
-    if (this.networkPlanning!.answer!.criticalTime.value !== criticalTime) {
+    if (abs(this.networkPlanning!.answer!.criticalTime.value! - criticalTime) >= 0.001) {
       errorMessage = 'Неверное значение!';
       this.networkPlanning!.answer!.criticalTime.borderColor = colorEnum.orange;
       this.networkPlanning!.answer!.criticalTime.value = null;

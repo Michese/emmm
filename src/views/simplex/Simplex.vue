@@ -58,6 +58,7 @@ import {
 import { InjectReactive, Watch } from 'vue-property-decorator';
 import { Fraction } from '@/class';
 import Answer from '@/views/simplex/answer/Answer.vue';
+import { abs } from '@/helper';
 
 @Options({
   name: 'Simplex',
@@ -116,7 +117,7 @@ export default class Simplex extends Vue {
             .map(row => new Fraction(row[1].value!).division(row[simplexTable.element!.column!].value!))
             .filter(fraction => fraction.valueOf() > 0),
           minFraction = Math.min(...fractions.map(fraction => fraction.valueOf()), valueFraction > 0 ? valueFraction : Infinity);
-        if (valueFraction !== minFraction) {
+        if (abs(valueFraction - minFraction) >= 0.001) {
           errorMessage = 'Разрешающий элемент выбран неверно!';
         }
       }
@@ -136,13 +137,13 @@ export default class Simplex extends Vue {
             if (!cell.value) return;
             let rightFraction: Fraction;
 
-            if (previousElement.column === columnIndex && previousElement.row === rowIndex) {
+            if (abs(previousElement.column! - columnIndex) <= 0.001 && abs(previousElement.row! - rowIndex) <= 0.001) {
               rightFraction = new Fraction({ top: 1, bottom: 1 }).division(previousCells[rowIndex][columnIndex].value!);
-            } else if (previousElement.column === columnIndex) {
+            } else if (abs(previousElement.column! - columnIndex) <= 0.001) {
               rightFraction = new Fraction(previousCells[rowIndex][columnIndex].value!)
                 .multiplication({ top: -1, bottom: 1 })
                 .division(previousCells[previousElement.row!][previousElement.column!].value!);
-            } else if (previousElement.row === rowIndex) {
+            } else if (abs(previousElement.row! - rowIndex) <= 0.001) {
               rightFraction = new Fraction(previousCells[rowIndex][columnIndex].value!).division(
                 previousCells[previousElement.row!][previousElement.column!].value!,
               );
@@ -153,7 +154,7 @@ export default class Simplex extends Vue {
               rightFraction = new Fraction(previousCells[rowIndex][columnIndex].value!).subtraction(deductibleFraction);
             }
 
-            if (rightFraction.toString() !== new Fraction(cell.value!).toString()) {
+            if (abs(rightFraction.valueOf() - new Fraction(cell.value!).valueOf()) >= 0.001) {
               cell.value = null;
               cell.borderColor = colorEnum.orange;
               errorMessage = 'Пересчет выполнен неверно!';
@@ -166,8 +167,8 @@ export default class Simplex extends Vue {
           row.forEach((cell, columnIndex) => {
             if (cell.constValue !== undefined) return;
             if (
-              cell.value!.top !== simplexTable.cells[rowIndex][columnIndex].value!.top ||
-              cell.value!.bottom !== simplexTable.cells[rowIndex][columnIndex].value!.bottom
+              abs(cell.value!.top - simplexTable.cells[rowIndex][columnIndex].value!.top) >= 0.001 ||
+              abs(cell.value!.bottom - simplexTable.cells[rowIndex][columnIndex].value!.bottom) >= 0.001
             ) {
               simplexTable.cells[rowIndex][columnIndex].value!.top = cell.value!.top!;
               simplexTable.cells[rowIndex][columnIndex].value!.bottom = cell.value!.bottom!;
@@ -176,13 +177,20 @@ export default class Simplex extends Vue {
           }),
         );
         const maxInteger = Math.floor(
-            Math.max(...previousTable.cells.slice(2, previousTable.cells.length).map(row => Math.abs(new Fraction(row[1].value!).valueOf()))),
+            Math.max(...previousTable.cells.slice(2, previousTable.cells.length).map(row => abs(new Fraction(row[1].value!).valueOf()))),
           ),
           lastRow = simplexTable.cells[simplexTable.cells.length - 1],
           rowsWithMaxInteger = previousTable.cells
             .slice(2, previousTable.cells.length)
-            .filter(row => Math.floor(Math.abs(new Fraction(row[1].value!).valueOf())) === maxInteger)
-            .filter(row => lastRow[1].value!.top < 0 && Number.isInteger(new Fraction(row[1].value!).addition(lastRow[1].value!).valueOf()));
+            .filter(row => abs(Math.floor(abs(new Fraction(row[1].value!).valueOf())) - maxInteger) <= 0.001)
+            .filter(
+              row =>
+                lastRow[1].value!.top < 0 &&
+                abs(
+                  new Fraction(row[1].value!).addition(lastRow[1].value!).valueOf() -
+                    Math.round(new Fraction(row[1].value!).addition(lastRow[1].value!).valueOf()),
+                ) <= 0.001,
+            );
         if (rowsWithMaxInteger.length === 0) {
           errorMessage = 'Строка выбрана неверно!';
           lastRow.slice(1, lastRow.length).forEach(cell => (cell.value = null));
@@ -192,12 +200,15 @@ export default class Simplex extends Vue {
               return (
                 columnIndex === 0 ||
                 columnIndex === 1 ||
-                (lastRow[columnIndex].value!.top <= 0 &&
-                  Number.isInteger(new Fraction(row[columnIndex].value!).addition(lastRow[columnIndex].value!).valueOf()))
+                (lastRow[columnIndex].value!.top <= 0.001 &&
+                  abs(
+                    new Fraction(row[columnIndex].value!).addition(lastRow[columnIndex].value!).valueOf() -
+                      Math.round(new Fraction(row[columnIndex].value!).addition(lastRow[columnIndex].value!).valueOf()),
+                  ) <= 0.001)
               );
             }),
           );
-          if (indexRow === -1) {
+          if (abs(indexRow + 1) <= 0.001) {
             rowsWithMaxInteger.forEach(row =>
               row.forEach((cell, columnIndex) => {
                 if (columnIndex < 2) return;
@@ -235,7 +246,7 @@ export default class Simplex extends Vue {
         if (
           referencePlanFound &&
           optimalPlanFound &&
-          (simplexTable.cells.slice(2, simplexTable.cells.length).every(row => row[1].value!.bottom === 1) || simplexTable.element)
+          (simplexTable.cells.slice(2, simplexTable.cells.length).every(row => abs(row[1].value!.bottom - 1) <= 0.001) || simplexTable.element)
         ) {
           this.simplex!.answer = initialAnswer(simplexTable.cells[0].length - 2, simplexTable.cells.length - 2);
           this.toDown();
@@ -271,6 +282,7 @@ export default class Simplex extends Vue {
 
     if (simplexTable.element) {
       simplexTable.element = null;
+      simplexTable.cells.forEach(row => row.forEach(cell => (cell.borderColor = null)));
     } else if (simplexTables.length === 1) {
       this.simplex!.simplexTable = null;
     } else {
@@ -285,7 +297,10 @@ export default class Simplex extends Vue {
       simplexTable = simplexTables[simplexTables.length - 1],
       { x, y, Lmin } = this.simplex!.answer!;
 
-    if (Lmin.value!.top !== simplexTable.cells[1][1].value!.top || Lmin.value!.bottom !== simplexTable.cells[1][1].value!.bottom) {
+    if (
+      abs(Lmin.value!.top - simplexTable.cells[1][1].value!.top) >= 0.001 ||
+      abs(Lmin.value!.bottom - simplexTable.cells[1][1].value!.bottom) >= 0.001
+    ) {
       errorMessage = 'Ошибка!';
       Lmin.value = null;
     }
@@ -297,16 +312,16 @@ export default class Simplex extends Vue {
 
         if (new RegExp('x', 'igu').test(row[0].constValue!)) {
           if (
-            x[index].value!.top !== simplexTable.cells[rowIndex + 2][1].value!.top ||
-            x[index].value!.bottom !== simplexTable.cells[rowIndex + 2][1].value!.bottom
+            abs(x[index].value!.top - simplexTable.cells[rowIndex + 2][1].value!.top) >= 0.001 ||
+            abs(x[index].value!.bottom - simplexTable.cells[rowIndex + 2][1].value!.bottom) >= 0.001
           ) {
             errorMessage = 'Ошибка!';
             x[index].value = null;
           }
         } else {
           if (
-            y[index].value!.top !== simplexTable.cells[rowIndex + 2][1].value!.top ||
-            y[index].value!.bottom !== simplexTable.cells[rowIndex + 2][1].value!.bottom
+            abs(y[index].value!.top - simplexTable.cells[rowIndex + 2][1].value!.top) >= 0.001 ||
+            abs(y[index].value!.bottom - simplexTable.cells[rowIndex + 2][1].value!.bottom) >= 0.001
           ) {
             errorMessage = 'Ошибка!';
             y[index].value = null;
@@ -321,12 +336,12 @@ export default class Simplex extends Vue {
         const index = +match.groups.index - 1;
 
         if (new RegExp('x', 'igu').test(cell.constValue!)) {
-          if (+x[index].value!.top !== 0 || x[index].value!.bottom !== 1) {
+          if (abs(+x[index].value!.top) >= 0.001 || abs(x[index].value!.bottom - 1) >= 0.001) {
             errorMessage = 'Ошибка!';
             x[index].value = null;
           }
         } else {
-          if (+y[index].value!.top !== 0 || y[index].value!.bottom !== 1) {
+          if (abs(+y[index].value!.top) >= 0.001 || abs(y[index].value!.bottom - 1) >= 0.001) {
             errorMessage = 'Ошибка!';
             y[index].value = null;
           }

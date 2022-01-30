@@ -63,6 +63,7 @@ import { InjectReactive, Watch } from 'vue-property-decorator';
 import Initial from '@/views/methodOfPotentials/initial/Initial.vue';
 import PotentialTable from '@/views/methodOfPotentials/potentialTable/PotentialTable.vue';
 import Answer from '@/views/methodOfPotentials/answer/Answer.vue';
+import { abs } from '@/helper';
 
 @Options({
   name: 'MethodOfPotentials',
@@ -102,14 +103,19 @@ export default class MethodOfPotentials extends Vue {
     const potentialTables = this.methodOfPotentials!.potentialTables!,
       potentialTable = potentialTables[potentialTables.length - 1];
 
-    if (potentialTable.step === 1) {
+    if (abs(potentialTable.step - 1) <= 0.001) {
       const totalRow = potentialTable.cells.slice(0, potentialTable.cells.length - 1).reduce((total, row) => row[row.length - 1].value! + total, 0);
       const totalColumn = potentialTable.cells[potentialTable.cells.length - 1]
         .slice(0, potentialTable.cells[potentialTable.cells.length - 1].length - 1)
         .reduce((total, cell) => cell.value! + total, 0);
       if (
-        potentialTable.cells[potentialTable.cells.length - 1][potentialTable.cells[potentialTable.cells.length - 1].length - 1].value !== totalRow ||
-        potentialTable.cells[potentialTable.cells.length - 1][potentialTable.cells[potentialTable.cells.length - 1].length - 1].value !== totalColumn
+        abs(
+          potentialTable.cells[potentialTable.cells.length - 1][potentialTable.cells[potentialTable.cells.length - 1].length - 1].value! - totalRow,
+        ) >= 0.001 ||
+        abs(
+          potentialTable.cells[potentialTable.cells.length - 1][potentialTable.cells[potentialTable.cells.length - 1].length - 1].value! -
+            totalColumn,
+        ) >= 0.001
       ) {
         potentialTable.cells[potentialTable.cells.length - 1][potentialTable.cells[potentialTable.cells.length - 1].length - 1].value = null;
         potentialTable.cells[potentialTable.cells.length - 1][potentialTable.cells[potentialTable.cells.length - 1].length - 1].borderColor =
@@ -120,14 +126,14 @@ export default class MethodOfPotentials extends Vue {
       if (!errorMessage) {
         potentialTable.step++;
       }
-    } else if (potentialTable.step === 2) {
+    } else if (abs(potentialTable.step - 2) <= 0.001) {
       potentialTable.cells.forEach(row => {
         const totalRow = row.slice(0, row.length - 1).reduce((total, cell) => total + (cell.value === null ? 0 : cell.value!), 0);
-        if (totalRow !== row[row.length - 1].value) {
+        if (abs(totalRow - row[row.length - 1].value!) >= 0.001) {
           errorMessage = 'Таблица заполнена неверно!';
           row.slice(0, row.length - 1).forEach(cell => {
             if (cell.value !== null) {
-              if (cell.value !== 0) cell.borderColor = colorEnum.orange;
+              if (abs(cell.value) >= 0.001) cell.borderColor = colorEnum.orange;
               cell.value = null;
             }
           });
@@ -155,21 +161,23 @@ export default class MethodOfPotentials extends Vue {
     let errorMessage = '';
     const potentialTables = this.methodOfPotentials!.potentialTables!,
       potentialTable = potentialTables[potentialTables.length - 1];
-    if (potentialTable.step === 1) {
+    if (abs(potentialTable.step - 1) <= 0.001) {
       const previousTable = potentialTables[potentialTables.length - 2];
 
       potentialTable.cells.slice(0, potentialTable.cells.length - 1).forEach((row, rowIndex) =>
         row.slice(0, row.length - 1).forEach((cell, columnIndex) => {
-          const pathIndex = previousTable.path.findIndex(path => path.row === rowIndex && path.column === columnIndex),
+          const pathIndex = previousTable.path.findIndex(path => abs(path.row - rowIndex) <= 0.001 && abs(path.column - columnIndex) <= 0.001),
             previousCell = previousTable.cells[rowIndex][columnIndex],
             previousCellValue = previousCell.value === null ? 0 : previousCell.value,
             cellValue = cell.value === null ? 0 : cell.value;
           if (
-            cellValue !==
-            previousCellValue +
-              (pathIndex >= 0
-                ? (pathIndex % 2 === 1 ? -1 : 1) * previousTable.cells[previousTable.minCell.row!][previousTable.minCell.column!].value!
-                : 0)
+            abs(
+              cellValue -
+                previousCellValue -
+                (pathIndex >= 0
+                  ? (pathIndex % 2 === 1 ? -1 : 1) * previousTable.cells[previousTable.minCell.row!][previousTable.minCell.column!].value!
+                  : 0),
+            ) >= 0.001
           ) {
             cell.value = null;
             cell.borderColor = colorEnum.orange;
@@ -180,20 +188,22 @@ export default class MethodOfPotentials extends Vue {
 
       potentialTable.cells
         .slice(0, potentialTable.cells.length - 1)
-        .forEach(row => row.slice(0, row.length - 1).forEach(cell => cell.value === 0 && (cell.value = null)));
+        .forEach(row => row.slice(0, row.length - 1).forEach(cell => abs(cell.value!) <= 0.001 && (cell.value = null)));
 
       if (!errorMessage) {
         potentialTable.step++;
       }
-    } else if (potentialTable.step === 2) {
+    } else if (abs(potentialTable.step - 2) <= 0.001) {
       potentialTable.cells.slice(0, potentialTable.cells.length - 1).forEach((row, rowIndex) =>
         row.slice(0, row.length - 1).forEach((cell, columnIndex) => {
           if (
             cell.value !== null &&
-            cell.value !== 0 &&
-            potentialTable.cells[rowIndex][potentialTable.cells[rowIndex].length - 1].value! +
-              potentialTable.cells[potentialTable.cells.length - 1][columnIndex].value! !==
-              cell.right
+            abs(cell.value) >= 0.001 &&
+            abs(
+              potentialTable.cells[rowIndex][potentialTable.cells[rowIndex].length - 1].value! +
+                potentialTable.cells[potentialTable.cells.length - 1][columnIndex].value! -
+                cell.right!,
+            ) >= 0.001
           ) {
             potentialTable.cells[rowIndex][potentialTable.cells[rowIndex].length - 1].value = null;
             potentialTable.cells[rowIndex][potentialTable.cells[rowIndex].length - 1].borderColor = colorEnum.orange;
@@ -207,7 +217,7 @@ export default class MethodOfPotentials extends Vue {
       if (!errorMessage) {
         potentialTable.step++;
       }
-    } else if (potentialTable.step === 3) {
+    } else if (abs(potentialTable.step - 3) <= 0.001) {
       let isEnd = true;
       const result = potentialTable.cells
         .slice(0, potentialTable.cells.length - 1)
@@ -216,9 +226,11 @@ export default class MethodOfPotentials extends Vue {
             .slice(0, row.length - 1)
             .every(
               (cell, columnIndex) =>
-                potentialTable.cells[rowIndex][potentialTable.cells[rowIndex].length - 1].value! +
-                  potentialTable.cells[potentialTable.cells.length - 1][columnIndex].value! ===
-                cell.left!.value,
+                abs(
+                  potentialTable.cells[rowIndex][potentialTable.cells[rowIndex].length - 1].value! +
+                    potentialTable.cells[potentialTable.cells.length - 1][columnIndex].value! -
+                    cell.left!.value!,
+                ) <= 0.001,
             ),
         );
       if (result) {
@@ -234,9 +246,11 @@ export default class MethodOfPotentials extends Vue {
         potentialTable.cells.slice(0, potentialTable.cells.length - 1).forEach((row, rowIndex) =>
           row.slice(0, row.length - 1).forEach((cell, columnIndex) => {
             if (
-              potentialTable.cells[rowIndex][potentialTable.cells[rowIndex].length - 1].value! +
-                potentialTable.cells[potentialTable.cells.length - 1][columnIndex].value! !==
-              cell.left!.value
+              abs(
+                potentialTable.cells[rowIndex][potentialTable.cells[rowIndex].length - 1].value! +
+                  potentialTable.cells[potentialTable.cells.length - 1][columnIndex].value! -
+                  cell.left!.value!,
+              ) >= 0.001
             ) {
               cell.left!.value = null;
               cell.left!.borderColor = colorEnum.orange;
@@ -254,23 +268,23 @@ export default class MethodOfPotentials extends Vue {
           potentialTable.step++;
         }
       }
-    } else if (potentialTable.step === 4) {
+    } else if (abs(potentialTable.step - 4) <= 0.001) {
       if (
         potentialTable.path.length > 2 &&
-        (potentialTable.path[0].row === potentialTable.path[potentialTable.path.length - 1].row ||
-          potentialTable.path[0].column === potentialTable.path[potentialTable.path.length - 1].column)
+        (abs(potentialTable.path[0].row - potentialTable.path[potentialTable.path.length - 1].row) <= 0.001 ||
+          abs(potentialTable.path[0].column - potentialTable.path[potentialTable.path.length - 1].column) <= 0.001)
       ) {
         potentialTable.step++;
       } else {
         errorMessage = 'Цикл построен неверно!';
       }
-    } else if (potentialTable.step === 5) {
+    } else if (abs(potentialTable.step - 5) <= 0.001) {
       const minCellUser = potentialTable.cells[potentialTable.minCell.row!][potentialTable.minCell.column!].value!,
         minCell = Math.min(
           ...potentialTable.path.filter((path, index) => index % 2 === 1).map(path => potentialTable.cells[path.row!][path.column!].value!),
         );
 
-      if (minCell === minCellUser) {
+      if (abs(minCell - minCellUser) <= 0.001) {
         this.methodOfPotentials!.potentialTables!.push(initialNextTable(potentialTable, false));
         potentialTable.step++;
         this.toDown();
@@ -293,7 +307,7 @@ export default class MethodOfPotentials extends Vue {
     const potentialTables = this.methodOfPotentials!.potentialTables!,
       potentialTable = potentialTables[potentialTables.length - 1];
     if (potentialTable.step > 1) {
-      if (potentialTable.step === 2) {
+      if (abs(potentialTable.step - 2) <= 0.001) {
         if (this.methodOfPotentials!.potentialTables!.length === 1) {
           potentialTable.cells.slice(0, potentialTable.cells.length - 1).forEach(row =>
             row.slice(0, row.length - 1).forEach(cell => {
@@ -313,19 +327,19 @@ export default class MethodOfPotentials extends Vue {
             cell.borderColor = null;
           });
         }
-      } else if (potentialTable.step === 3) {
+      } else if (abs(potentialTable.step - 3) <= 0.001) {
         potentialTable.cells.slice(0, potentialTable.cells.length - 1).forEach(row =>
           row.slice(0, row.length - 1).forEach(cell => {
             cell.left!.value = null;
             cell.left!.borderColor = null;
           }),
         );
-      } else if (potentialTable.step === 4) {
+      } else if (abs(potentialTable.step - 4) <= 0.001) {
         potentialTable.path = [];
         potentialTable.cells
           .slice(0, potentialTable.cells.length - 1)
           .forEach(row => row.slice(0, row.length - 1).forEach(cell => (cell.left!.borderColor = null)));
-      } else if (potentialTable.step === 5) {
+      } else if (abs(potentialTable.step - 5) <= 0.001) {
         potentialTable.minCell.row = null;
         potentialTable.minCell.column = null;
       } else throw new Error('Такого шага не существует!');
@@ -349,7 +363,7 @@ export default class MethodOfPotentials extends Vue {
         0,
       );
 
-    if (Math.abs(Lmin - this.methodOfPotentials!.answer!.Lmin!) >= 0.001) {
+    if (abs(Lmin - this.methodOfPotentials!.answer!.Lmin!) >= 0.001) {
       this.methodOfPotentials!.answer!.Lmin = null;
       errorMessage = 'Ошибка!';
     }

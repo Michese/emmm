@@ -95,6 +95,7 @@ import { initialElement, initialSimplexTableWithPrevious } from '@/views/simplex
 import SimplexTable from '@/views/simplex/simplexTable/SimplexTable.vue';
 import { Fraction } from '@/class';
 import Answer from '@/views/investmentOfFunds/answer/Answer.vue';
+import { abs } from '@/helper';
 
 @Options({
   name: 'InvestmentOfFunds',
@@ -111,6 +112,31 @@ export default class InvestmentOfFunds extends Vue {
   @Watch('investmentOfFunds', { deep: true }) wInvestmentOfFunds(): void {
     const investmentOfFundsJSON = JSON.stringify(this.investmentOfFunds);
     sessionStorage.setItem('investmentOfFunds', investmentOfFundsJSON);
+  }
+
+  get secondCaseApply(): () => void {
+    return this.investmentOfFunds!.secondCase!.conditions === null ? this.secondCaseInitialApply : this.secondCaseConditionApply;
+  }
+
+  get firstCaseBack(): () => void {
+    return this.investmentOfFunds!.firstCase!.length <= 1 ? this.firstCaseFirstBack : this.firstCaseAddBack;
+  }
+
+  get secondCaseBack(): () => void {
+    return this.investmentOfFunds!.secondCase!.conditions === null
+      ? this.secondCaseInitialBack
+      : this.investmentOfFunds!.secondCase!.conditions.length <= 1
+      ? this.secondCaseFirstConditionBack
+      : this.secondCaseConditionBack;
+  }
+
+  get simplexTableApply(): () => void {
+    const simplexTable = this.investmentOfFunds!.simplexTables![this.investmentOfFunds!.simplexTables!.length - 1];
+    return simplexTable.element !== null
+      ? this.simplexTableElementApply
+      : this.investmentOfFunds!.simplexTables!.length <= 1
+      ? this.simplexTableFirstApply
+      : this.simplexTableInitialApply;
   }
 
   initialApply(): void {
@@ -137,34 +163,30 @@ export default class InvestmentOfFunds extends Vue {
     }
   }
 
-  get firstCaseBack(): () => void {
-    return this.investmentOfFunds!.firstCase!.length <= 1 ? this.firstCaseFirstBack : this.firstCaseAddBack;
-  }
-
   firstCaseApply(): void {
     let errorMessage = '';
     const { coefficients, t2, t4, t6 } = this.investmentOfFunds!.conditions;
 
     this.investmentOfFunds!.firstCase!.forEach((condition, index) => {
-      if (Math.abs(condition.coef! - coefficients[index].t!) >= 0.0001) {
+      if (abs(condition.coef! - coefficients[index].t!) >= 0.0001) {
         errorMessage = 'Значение указано неверно!';
         condition.coef = null;
       }
 
-      if (Math.abs(condition.a! - coefficients[index].x!) >= 0.0001) {
+      if (abs(condition.a! - coefficients[index].x!) >= 0.0001) {
         errorMessage = 'Значение указано неверно!';
         condition.a = null;
       }
 
-      if (Math.abs(condition.x! - coefficients[index].upperBound!) >= 0.0001) {
+      if (abs(condition.x! - coefficients[index].upperBound!) >= 0.0001) {
         errorMessage = 'Значение указано неверно!';
         condition.x = null;
       }
 
       if (
-        (index === 0 && Math.abs(condition.t! - t2!) >= 0.0001) ||
-        (index === 1 && Math.abs(condition.t! - t4!) >= 0.0001) ||
-        (index === 2 && Math.abs(condition.t! - t6!) >= 0.0001)
+        (index === 0 && abs(condition.t! - t2!) >= 0.0001) ||
+        (index === 1 && abs(condition.t! - t4!) >= 0.0001) ||
+        (index === 2 && abs(condition.t! - t6!) >= 0.0001)
       ) {
         errorMessage = 'Значение указано неверно!';
         condition.t = null;
@@ -205,15 +227,11 @@ export default class InvestmentOfFunds extends Vue {
     this.investmentOfFunds!.firstCase!.pop();
   }
 
-  get secondCaseApply(): () => void {
-    return this.investmentOfFunds!.secondCase!.conditions === null ? this.secondCaseInitialApply : this.secondCaseConditionApply;
-  }
-
   secondCaseInitialApply(): void {
     let errorMessage = '';
 
     if (
-      Math.abs(
+      abs(
         this.investmentOfFunds!.secondCase!.criticalTime! -
           this.investmentOfFunds!.conditions.coefficients.reduce((total, coef) => total + coef.t!, 0),
       ) >= 0.0001
@@ -222,7 +240,7 @@ export default class InvestmentOfFunds extends Vue {
       this.investmentOfFunds!.secondCase!.differenceTime = null;
       errorMessage = 'Критическое время вычислено неверно!';
     } else if (
-      Math.abs(
+      abs(
         this.investmentOfFunds!.secondCase!.differenceTime! -
           this.investmentOfFunds!.secondCase!.criticalTime! +
           this.investmentOfFunds!.conditions.T0!,
@@ -248,17 +266,21 @@ export default class InvestmentOfFunds extends Vue {
       differenceTime = this.investmentOfFunds!.secondCase!.differenceTime!;
 
     this.investmentOfFunds!.secondCase!.conditions!.forEach((condition, index) => {
-      if (condition.coef !== coefficients[index].t) {
+      if (abs(condition.coef! - coefficients[index].t!) >= 0.001) {
         errorMessage = 'Значение указано неверно!';
         condition.coef = null;
       }
 
-      if (condition.differenceTime !== differenceTime) {
+      if (abs(condition.differenceTime! - differenceTime) >= 0.001) {
         errorMessage = 'Значение указано неверно!';
         condition.differenceTime = null;
       }
 
-      if ((index === 0 && condition.t !== t2) || (index === 1 && condition.t !== t4) || (index === 2 && condition.t !== t6)) {
+      if (
+        (index === 0 && abs(condition.t! - t2!) >= 0.001) ||
+        (index === 1 && abs(condition.t! - t4!) >= 0.001) ||
+        (index === 2 && abs(condition.t! - t6!) >= 0.001)
+      ) {
         errorMessage = 'Значение указано неверно!';
         condition.t = null;
       }
@@ -289,14 +311,6 @@ export default class InvestmentOfFunds extends Vue {
     }
   }
 
-  get secondCaseBack(): () => void {
-    return this.investmentOfFunds!.secondCase!.conditions === null
-      ? this.secondCaseInitialBack
-      : this.investmentOfFunds!.secondCase!.conditions.length <= 1
-      ? this.secondCaseFirstConditionBack
-      : this.secondCaseConditionBack;
-  }
-
   secondCaseInitialBack(): void {
     this.investmentOfFunds!.secondCase = null;
   }
@@ -315,18 +329,18 @@ export default class InvestmentOfFunds extends Vue {
     let rightPart = criticalTime - this.investmentOfFunds!.conditions.T0!,
       resultX = this.investmentOfFunds!.conditions.coefficients.map(coef => coef.t! * coef.x!);
 
-    while (Math.abs(rightPart - Math.round(rightPart)) >= 0.00001 || resultX.some(x => Math.abs(x - Math.round(x)) >= 0.0001)) {
+    while (abs(rightPart - Math.round(rightPart)) >= 0.00001 || resultX.some(x => abs(x - Math.round(x)) >= 0.0001)) {
       rightPart *= 10;
       resultX = resultX.map(x => x * 10);
     }
 
-    if (Math.abs(this.investmentOfFunds!.Lmin!.result! - rightPart) >= 0.0001) {
+    if (abs(this.investmentOfFunds!.Lmin!.result! - rightPart) >= 0.0001) {
       this.investmentOfFunds!.Lmin!.result = null;
       errorMessage = 'Неравенство составлено неверно!';
     }
 
     this.investmentOfFunds!.Lmin!.coefficients.forEach((coef, index) => {
-      if (Math.abs(coef.x! - resultX[index]) >= 0.0001) {
+      if (abs(coef.x! - resultX[index]) >= 0.0001) {
         coef.x = null;
         errorMessage = 'Неравенство составлено неверно!';
       }
@@ -350,42 +364,33 @@ export default class InvestmentOfFunds extends Vue {
     this.investmentOfFunds!.Lmin = null;
   }
 
-  get simplexTableApply(): () => void {
-    const simplexTable = this.investmentOfFunds!.simplexTables![this.investmentOfFunds!.simplexTables!.length - 1];
-    return simplexTable.element !== null
-      ? this.simplexTableElementApply
-      : this.investmentOfFunds!.simplexTables!.length <= 1
-      ? this.simplexTableFirstApply
-      : this.simplexTableInitialApply;
-  }
-
   simplexTableFirstApply(): void {
     let errorMessage = '';
     const simplexTables = this.investmentOfFunds!.simplexTables!,
       simplexTable = simplexTables[simplexTables.length - 1];
 
-    if (new Fraction(simplexTable.cells[1][1].value!).valueOf() !== 0) {
+    if (abs(new Fraction(simplexTable.cells[1][1].value!).valueOf()) >= 0.001) {
       simplexTable.cells[1][1].value = null;
       simplexTable.cells[1][1].borderColor = colorEnum.orange;
       errorMessage = 'Таблица заполнена неверно!';
     }
 
     simplexTable.cells[1].slice(2, simplexTable.cells[1].length).forEach(cell => {
-      if (new Fraction(cell.value!).valueOf() !== -1) {
+      if (abs(new Fraction(cell.value!).valueOf() + 1) >= 0.001) {
         cell.value = null;
         cell.borderColor = colorEnum.orange;
         errorMessage = 'Таблица заполнена неверно!';
       }
     });
 
-    if (new Fraction(simplexTable.cells[2][1].value!).valueOf() !== -this.investmentOfFunds!.Lmin!.result!) {
+    if (abs(new Fraction(simplexTable.cells[2][1].value!).valueOf() + this.investmentOfFunds!.Lmin!.result!) >= 0.001) {
       simplexTable.cells[2][1].value = null;
       simplexTable.cells[2][1].borderColor = colorEnum.orange;
       errorMessage = 'Таблица заполнена неверно!';
     }
 
     simplexTable.cells[2].slice(2, simplexTable.cells[2].length).forEach((cell, indexColumn) => {
-      if (new Fraction(cell.value!).valueOf() !== -this.investmentOfFunds!.Lmin!.coefficients[indexColumn].x!) {
+      if (abs(new Fraction(cell.value!).valueOf() + this.investmentOfFunds!.Lmin!.coefficients[indexColumn].x!) >= 0.001) {
         cell.value = null;
         cell.borderColor = colorEnum.orange;
         errorMessage = 'Таблица заполнена неверно!';
@@ -393,7 +398,7 @@ export default class InvestmentOfFunds extends Vue {
     });
 
     simplexTable.cells.slice(3, simplexTable.cells.length).forEach((row, indexRow) => {
-      if (new Fraction(row[1].value!).valueOf() !== this.investmentOfFunds!.conditions.coefficients[indexRow].upperBound) {
+      if (abs(new Fraction(row[1].value!).valueOf() - this.investmentOfFunds!.conditions.coefficients[indexRow].upperBound!) >= 0.001) {
         row[1].value = null;
         row[1].borderColor = colorEnum.orange;
         errorMessage = 'Таблица заполнена неверно!';
@@ -401,8 +406,8 @@ export default class InvestmentOfFunds extends Vue {
 
       row.slice(2, row.length).forEach((cell, indexColumn) => {
         if (
-          (indexColumn === indexRow && new Fraction(cell.value!).valueOf() !== 1) ||
-          (indexColumn !== indexRow && new Fraction(cell.value!).valueOf() !== 0)
+          (indexColumn === indexRow && abs(new Fraction(cell.value!).valueOf() - 1) >= 0.001) ||
+          (indexColumn !== indexRow && abs(new Fraction(cell.value!).valueOf()) >= 0.001)
         ) {
           cell.value = null;
           cell.borderColor = colorEnum.orange;
@@ -465,13 +470,13 @@ export default class InvestmentOfFunds extends Vue {
         if (!cell.value) return;
         let rightFraction: Fraction;
 
-        if (previousElement.column === columnIndex && previousElement.row === rowIndex) {
+        if (abs(previousElement.column! - columnIndex) <= 0.001 && abs(previousElement.row! - rowIndex) <= 0.001) {
           rightFraction = new Fraction({ top: 1, bottom: 1 }).division(previousCells[rowIndex][columnIndex].value!);
-        } else if (previousElement.column === columnIndex) {
+        } else if (abs(previousElement.column! - columnIndex) <= 0.001) {
           rightFraction = new Fraction(previousCells[rowIndex][columnIndex].value!)
             .multiplication({ top: -1, bottom: 1 })
             .division(previousCells[previousElement.row!][previousElement.column!].value!);
-        } else if (previousElement.row === rowIndex) {
+        } else if (abs(previousElement.row! - rowIndex) <= 0.001) {
           rightFraction = new Fraction(previousCells[rowIndex][columnIndex].value!).division(
             previousCells[previousElement.row!][previousElement.column!].value!,
           );
@@ -482,7 +487,7 @@ export default class InvestmentOfFunds extends Vue {
           rightFraction = new Fraction(previousCells[rowIndex][columnIndex].value!).subtraction(deductibleFraction);
         }
 
-        if (rightFraction.toString() !== new Fraction(cell.value!).toString()) {
+        if (abs(rightFraction.valueOf() - new Fraction(cell.value!).valueOf()) >= 0.001) {
           cell.value = null;
           cell.borderColor = colorEnum.orange;
           errorMessage = 'Пересчет выполнен неверно!';
@@ -521,7 +526,7 @@ export default class InvestmentOfFunds extends Vue {
           .map(row => new Fraction(row[1].value!).division(row[simplexTable.element!.column!].value!))
           .filter(fraction => fraction.valueOf() > 0),
         minFraction = Math.min(...fractions.map(fraction => fraction.valueOf()), valueFraction > 0 ? valueFraction : Infinity);
-      if (valueFraction !== minFraction) {
+      if (abs(valueFraction - minFraction) >= 0.001) {
         errorMessage = 'Разрешающий элемент выбран неверно!';
       }
     }
@@ -543,6 +548,7 @@ export default class InvestmentOfFunds extends Vue {
 
     if (simplexTable.element) {
       simplexTable.element = null;
+      simplexTable.cells.forEach(row => row.forEach(cell => (cell.borderColor = null)));
     } else if (this.investmentOfFunds!.simplexTables!.length <= 1) {
       this.investmentOfFunds!.simplexTables = null;
     } else {
@@ -558,10 +564,10 @@ export default class InvestmentOfFunds extends Vue {
       xKeys = [1, 3, 5, 7],
       keys = xKeys.map(key => {
         const foundedIndexRow = simplexTable.cells.findIndex(row => row[0].constValue === `x<sub>${key}</sub>`);
-        return { key: `x${key}`, index: foundedIndexRow === -1 ? null : foundedIndexRow };
+        return { key: `x${key}`, index: foundedIndexRow < -0.001 ? null : foundedIndexRow };
       });
 
-    if (new Fraction(this.investmentOfFunds!.answer!.Lmin.value!).toString() !== new Fraction(simplexTable.cells[1][1].value!).toString()) {
+    if (abs(new Fraction(this.investmentOfFunds!.answer!.Lmin.value!).valueOf() - new Fraction(simplexTable.cells[1][1].value!).valueOf()) >= 0.001) {
       errorMessage = 'Ответ неверный!';
       this.investmentOfFunds!.answer!.Lmin.value = null;
       this.investmentOfFunds!.answer!.Lmin.borderColor = colorEnum.orange;
@@ -569,10 +575,11 @@ export default class InvestmentOfFunds extends Vue {
 
     keys.forEach(key => {
       if (
-        (key.index === null && new Fraction(this.investmentOfFunds!.answer![key.key].value!).valueOf() !== 0) ||
+        (key.index === null && abs(new Fraction(this.investmentOfFunds!.answer![key.key].value!).valueOf()) >= 0.001) ||
         (key.index !== null &&
-          new Fraction(this.investmentOfFunds!.answer![key.key].value!).toString() !==
-            new Fraction(simplexTable.cells[key.index][1].value!).toString())
+          abs(
+            new Fraction(this.investmentOfFunds!.answer![key.key].value!).valueOf() - new Fraction(simplexTable.cells[key.index][1].value!).valueOf(),
+          ) >= 0.001)
       ) {
         errorMessage = 'Ответ неверный!';
         this.investmentOfFunds!.answer![key.key].value = null;
