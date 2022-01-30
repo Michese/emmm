@@ -12,7 +12,7 @@
         :is-current-step="!geometricMethod?.pointsForLines"
         :condition="geometricMethod.condition"
         @apply="initialApply"
-        @upload="geometricMethod = $event"
+        @upload="uploadFile($event)"
         class="geometric-method__initial"
       />
       <building-straight-lines
@@ -84,7 +84,7 @@ import { InjectReactive, Watch } from 'vue-property-decorator';
 import GeometricMethodGraphic from '@/views/geometricMethod/geometricMethodGraphic/GeometricMethodGraphic.vue';
 import BuildingVector from '@/views/geometricMethod/buildingVector/BuildingVector.vue';
 import Answer from '@/views/geometricMethod/answer/Answer.vue';
-import { abs } from '@/helper';
+import { abs, checkHashObject, creatorHashJSON } from '@/helper';
 
 @Options({
   name: 'GeometricMethod',
@@ -386,8 +386,34 @@ export default class GeometricMethod extends Vue {
     this.$refs.linkFooter.click();
   }
 
-  saveFile(): void {
-    const geometricMethodJSON = JSON.stringify(this.geometricMethod);
+  async uploadFile(geometricMethod: tGeometricMethod): Promise<void> {
+    let errorMessage = '';
+    if (
+      !(
+        'condition' in geometricMethod &&
+        'pointsForLines' in geometricMethod &&
+        'pointsForVector' in geometricMethod &&
+        'pointVectorForGraphic' in geometricMethod &&
+        'answer' in geometricMethod &&
+        'countErrors' in geometricMethod &&
+        'showResult' in geometricMethod &&
+        'nonce' in geometricMethod
+      )
+    ) {
+      errorMessage = 'Неверный формат данных в файле!';
+    } else if (!(await checkHashObject(geometricMethod))) {
+      errorMessage = 'Внимание! Попытка жульничества!';
+    }
+
+    if (errorMessage) {
+      if (this.openErrorModal) this.openErrorModal(errorMessage);
+    } else {
+      this.geometricMethod = geometricMethod;
+    }
+  }
+
+  async saveFile(): Promise<void> {
+    const geometricMethodJSON = await creatorHashJSON(this.geometricMethod!);
     this.$refs.saveFileModal.showModal(geometricMethodJSON);
   }
 

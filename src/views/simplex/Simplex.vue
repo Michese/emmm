@@ -12,7 +12,7 @@
         v-if="simplex?.parameters"
         :is-current-step="!simplex?.simplexTable"
         :parameters="simplex.parameters"
-        @upload="setSimplex"
+        @upload="uploadFile"
         @apply="initialApply"
         class="simplex__section"
       />
@@ -58,7 +58,7 @@ import {
 import { InjectReactive, Watch } from 'vue-property-decorator';
 import { Fraction } from '@/class';
 import Answer from '@/views/simplex/answer/Answer.vue';
-import { abs } from '@/helper';
+import { abs, checkHashObject, creatorHashJSON } from '@/helper';
 
 @Options({
   name: 'Simplex',
@@ -371,8 +371,32 @@ export default class Simplex extends Vue {
     this.simplex = initialSimplex();
   }
 
-  saveFile(): void {
-    const simplexJSON = JSON.stringify(this.simplex);
+  async uploadFile(simplex: tSimplex): Promise<void> {
+    let errorMessage = '';
+    if (
+      !(
+        'parameters' in simplex &&
+        'simplexTable' in simplex &&
+        'answer' in simplex &&
+        'countErrors' in simplex &&
+        'showResult' in simplex &&
+        'nonce' in simplex
+      )
+    ) {
+      errorMessage = 'Неверный формат данных в файле!';
+    } else if (!(await checkHashObject(simplex))) {
+      errorMessage = 'Внимание! Попытка жульничества!';
+    }
+
+    if (errorMessage) {
+      if (this.openErrorModal) this.openErrorModal(errorMessage);
+    } else {
+      this.simplex = simplex;
+    }
+  }
+
+  async saveFile(): Promise<void> {
+    const simplexJSON = await creatorHashJSON(this.simplex!);
     this.$refs.saveFileModal.showModal(simplexJSON);
   }
 

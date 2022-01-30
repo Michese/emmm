@@ -59,6 +59,7 @@ type tInvestmentOfFunds = {
   answer: tAnswer | null;
   showResult: boolean;
   countErrors: number;
+  nonce?: string;
 };
 
 export { tConditions, tInvestmentOfFunds, tAnswer, tCoefficient, tLmin, tFirstCase, tSecondCase, tSecondCaseCondition };

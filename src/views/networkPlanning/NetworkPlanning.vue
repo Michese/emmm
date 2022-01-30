@@ -12,7 +12,7 @@
         v-if="networkPlanning?.parameters"
         :is-current-step="!networkPlanning?.oldWorks"
         :parameters="networkPlanning.parameters"
-        @upload="setNetworkPlanning"
+        @upload="uploadFile"
         @apply="initialApply"
         class="network-planning__initial"
       />
@@ -88,7 +88,7 @@ import NewNetworkTable from '@/views/networkPlanning/newNetworkTable/NewNetworkT
 import CreatorPath from '@/views/networkPlanning/creatorPath/CreatorPath.vue';
 import { initialOldPath } from '@/views/networkPlanning/component/functions/initialOldPath';
 import Answer from '@/views/networkPlanning/answer/Answer.vue';
-import { abs } from '@/helper';
+import { abs, checkHashObject, creatorHashJSON } from '@/helper';
 
 @Options({
   name: 'NetworkPlanning',
@@ -312,12 +312,38 @@ export default class NetworkPlanning extends Vue {
   }
 
   fullReset(): void {
-    if (sessionStorage.getItem('networkPlanning')) sessionStorage.removeItem('networkPlanningJSON');
+    if (sessionStorage.getItem('networkPlanning')) sessionStorage.removeItem('networkPlanning');
     this.networkPlanning = initialNetworkPlanning();
   }
 
-  saveFile(): void {
-    const networkPlanningJSON = JSON.stringify(this.networkPlanning);
+  async uploadFile(networkPlanning: tNetworkPlanning): Promise<void> {
+    let errorMessage = '';
+    if (
+      !(
+        'parameters' in networkPlanning &&
+        'oldWorks' in networkPlanning &&
+        'newWorks' in networkPlanning &&
+        'path' in networkPlanning &&
+        'answer' in networkPlanning &&
+        'countErrors' in networkPlanning &&
+        'showResult' in networkPlanning &&
+        'nonce' in networkPlanning
+      )
+    ) {
+      errorMessage = 'Неверный формат данных в файле!';
+    } else if (!(await checkHashObject(networkPlanning))) {
+      errorMessage = 'Внимание! Попытка жульничества!';
+    }
+
+    if (errorMessage) {
+      if (this.openErrorModal) this.openErrorModal(errorMessage);
+    } else {
+      this.networkPlanning = networkPlanning;
+    }
+  }
+
+  async saveFile(): Promise<void> {
+    const networkPlanningJSON = await creatorHashJSON(this.networkPlanning!);
     this.$refs.saveFileModal.showModal(networkPlanningJSON);
   }
 

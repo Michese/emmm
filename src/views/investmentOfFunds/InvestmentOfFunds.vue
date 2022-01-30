@@ -12,7 +12,7 @@
         v-if="investmentOfFunds"
         :conditions="investmentOfFunds.conditions"
         :is-current-step="!investmentOfFunds.firstCase"
-        @upload="setInvestmentOfFunds"
+        @upload="uploadFile"
         @apply="initialApply"
       />
 
@@ -95,7 +95,7 @@ import { initialElement, initialSimplexTableWithPrevious } from '@/views/simplex
 import SimplexTable from '@/views/simplex/simplexTable/SimplexTable.vue';
 import { Fraction } from '@/class';
 import Answer from '@/views/investmentOfFunds/answer/Answer.vue';
-import { abs } from '@/helper';
+import { abs, checkHashObject, creatorHashJSON } from '@/helper';
 
 @Options({
   name: 'InvestmentOfFunds',
@@ -609,8 +609,8 @@ export default class InvestmentOfFunds extends Vue {
     this.investmentOfFunds = initialInvestmentOfFunds();
   }
 
-  saveFile(): void {
-    const investmentOfFundsJSON = JSON.stringify(this.investmentOfFunds);
+  async saveFile(): Promise<void> {
+    const investmentOfFundsJSON = await creatorHashJSON(this.investmentOfFunds!);
     this.$refs.saveFileModal.showModal(investmentOfFundsJSON);
   }
 
@@ -618,11 +618,35 @@ export default class InvestmentOfFunds extends Vue {
     this.$refs.linkFooter.click();
   }
 
+  async uploadFile(investmentOfFunds: tInvestmentOfFunds): Promise<void> {
+    let errorMessage = '';
+    if (
+      !(
+        'conditions' in investmentOfFunds &&
+        'firstCase' in investmentOfFunds &&
+        'secondCase' in investmentOfFunds &&
+        'Lmin' in investmentOfFunds &&
+        'simplexTables' in investmentOfFunds &&
+        'answer' in investmentOfFunds &&
+        'showResult' in investmentOfFunds &&
+        'countErrors' in investmentOfFunds &&
+        'nonce' in investmentOfFunds
+      )
+    ) {
+      errorMessage = 'Неверный формат данных в файле!';
+    } else if (!(await checkHashObject(investmentOfFunds))) {
+      errorMessage = 'Внимание! Попытка жульничества!';
+    }
+
+    if (errorMessage) {
+      if (this.openErrorModal) this.openErrorModal(errorMessage);
+    } else {
+      this.investmentOfFunds = investmentOfFunds;
+    }
+  }
+
   setInvestmentOfFunds(investmentOfFunds: tInvestmentOfFunds): void {
-    this.investmentOfFunds = {
-      ...initialInvestmentOfFunds(),
-      ...investmentOfFunds,
-    };
+    this.investmentOfFunds = investmentOfFunds;
   }
 
   created(): void {

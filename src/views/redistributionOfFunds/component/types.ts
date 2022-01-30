@@ -49,6 +49,7 @@ type tRedistributionOfFunds = {
   secondCase: tCase | null;
   countErrors: number;
   showResult: boolean;
+  nonce?: string;
 };
 
 export { tRedistributionOfFunds, tCondition, tCase, tVectorPoint, tVector, tAnswer, tSystem };

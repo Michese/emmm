@@ -6,6 +6,7 @@ type tMethodOfPotentials = {
   answer: tAnswer | null;
   countErrors: number;
   showResult: boolean;
+  nonce?: string;
 };
 
 type tPath = {

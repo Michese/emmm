@@ -37,6 +37,7 @@ type tNetworkPlanning = {
   answer: tAnswer | null;
   countErrors: number;
   showResult: boolean;
+  nonce?: string;
 };
 
 type tAnswer = {

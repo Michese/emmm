@@ -7,6 +7,7 @@ type tSimplex = {
   answer: tAnswer | null;
   countErrors: number;
   showResult: boolean;
+  nonce?: string;
 };
 
 type tParameters = {

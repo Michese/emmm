@@ -12,7 +12,7 @@
         v-if="methodOfPotentials?.parameters"
         :is-current-step="!methodOfPotentials?.potentialTables"
         :parameters="methodOfPotentials.parameters"
-        @upload="setMethodOfPotentials"
+        @upload="uploadFile"
         @apply="initialApply"
         class="method-of-potentials__section"
       />
@@ -63,7 +63,7 @@ import { InjectReactive, Watch } from 'vue-property-decorator';
 import Initial from '@/views/methodOfPotentials/initial/Initial.vue';
 import PotentialTable from '@/views/methodOfPotentials/potentialTable/PotentialTable.vue';
 import Answer from '@/views/methodOfPotentials/answer/Answer.vue';
-import { abs } from '@/helper';
+import { abs, checkHashObject, creatorHashJSON } from '@/helper';
 
 @Options({
   name: 'MethodOfPotentials',
@@ -386,8 +386,32 @@ export default class MethodOfPotentials extends Vue {
     this.methodOfPotentials!.showResult = false;
   }
 
-  saveFile(): void {
-    const methodOfPotentialsJSON = JSON.stringify(this.methodOfPotentials);
+  async uploadFile(methodOfPotentials: tMethodOfPotentials): Promise<void> {
+    let errorMessage = '';
+    if (
+      !(
+        'parameters' in methodOfPotentials &&
+        'potentialTables' in methodOfPotentials &&
+        'answer' in methodOfPotentials &&
+        'countErrors' in methodOfPotentials &&
+        'showResult' in methodOfPotentials &&
+        'nonce' in methodOfPotentials
+      )
+    ) {
+      errorMessage = 'Неверный формат данных в файле!';
+    } else if (!(await checkHashObject(methodOfPotentials))) {
+      errorMessage = 'Внимание! Попытка жульничества!';
+    }
+
+    if (errorMessage) {
+      if (this.openErrorModal) this.openErrorModal(errorMessage);
+    } else {
+      this.methodOfPotentials = methodOfPotentials;
+    }
+  }
+
+  async saveFile(): Promise<void> {
+    const methodOfPotentialsJSON = await creatorHashJSON(this.methodOfPotentials!);
     this.$refs.saveFileModal.showModal(methodOfPotentialsJSON);
   }
 

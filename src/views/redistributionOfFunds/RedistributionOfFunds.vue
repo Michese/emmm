@@ -13,7 +13,7 @@
         :is-current-step="!redistributionOfFunds.firstCase"
         :conditions="redistributionOfFunds.conditions"
         @apply="initialApply"
-        @upload="setRedistributionOfFunds"
+        @upload="uploadFile"
         class="redistribution-of-funds__section"
       />
 
@@ -131,7 +131,7 @@ import Vector from '@/views/redistributionOfFunds/vector/Vector.vue';
 import Graphic from '@/views/redistributionOfFunds/graphic/Graphic.vue';
 import Answer from '@/views/redistributionOfFunds/answer/Answer.vue';
 import System from '@/views/redistributionOfFunds/system/System.vue';
-import { abs } from '@/helper';
+import { abs, checkHashObject, creatorHashJSON } from '@/helper';
 
 @Options({
   name: 'RedistributionOfFunds',
@@ -396,8 +396,32 @@ export default class RedistributionOfFunds extends Vue {
     this.redistributionOfFunds = initialRedistributionOfFunds();
   }
 
-  saveFile(): void {
-    const redistributionOfFundsJSON = JSON.stringify(this.redistributionOfFunds);
+  async uploadFile(redistributionOfFunds: tRedistributionOfFunds): Promise<void> {
+    let errorMessage = '';
+    if (
+      !(
+        'conditions' in redistributionOfFunds &&
+        'firstCase' in redistributionOfFunds &&
+        'secondCase' in redistributionOfFunds &&
+        'showResult' in redistributionOfFunds &&
+        'countErrors' in redistributionOfFunds &&
+        'nonce' in redistributionOfFunds
+      )
+    ) {
+      errorMessage = 'Неверный формат данных в файле!';
+    } else if (!(await checkHashObject(redistributionOfFunds))) {
+      errorMessage = 'Внимание! Попытка жульничества!';
+    }
+
+    if (errorMessage) {
+      if (this.openErrorModal) this.openErrorModal(errorMessage);
+    } else {
+      this.redistributionOfFunds = redistributionOfFunds;
+    }
+  }
+
+  async saveFile(): Promise<void> {
+    const redistributionOfFundsJSON = await creatorHashJSON(this.redistributionOfFunds!);
     this.$refs.saveFileModal.showModal(redistributionOfFundsJSON);
   }
 
