@@ -16,7 +16,13 @@ import { EmmmErrorModal, EmmmSprite } from '@/components';
 import { ProvideReactive, Watch } from 'vue-property-decorator';
 import { tMenuItems } from '@/types';
 import { routerNameEnum } from '@/enums';
-import initialMenuItems from '@/initialMenuItems';
+import Home from '@/views/home/Home.vue';
+import GeometricMethod from '@/views/geometricMethod/GeometricMethod.vue';
+import Simplex from '@/views/simplex/Simplex.vue';
+import MethodOfPotentials from '@/views/methodOfPotentials/MethodOfPotentials.vue';
+import NetworkPlanning from '@/views/networkPlanning/NetworkPlanning.vue';
+import RedistributionOfFunds from '@/views/redistributionOfFunds/RedistributionOfFunds.vue';
+import InvestmentOfFunds from '@/views/investmentOfFunds/InvestmentOfFunds.vue';
 
 @Options({
   name: 'App',
@@ -39,7 +45,59 @@ export default class App extends Vue {
 
   @ProvideReactive('menuItems')
   get menuItems(): tMenuItems {
-    return initialMenuItems;
+    return {
+      [routerNameEnum.Home]: {
+        icon: 'home',
+        title: 'Главная',
+        key: routerNameEnum.Home,
+        to: Home,
+      },
+      [routerNameEnum.GeometricMethod]: {
+        icon: 'geometry',
+        title: 'Геометрический метод',
+        key: routerNameEnum.GeometricMethod,
+        to: GeometricMethod,
+      },
+      [routerNameEnum.Simplex]: {
+        icon: 'table',
+        title: 'Симплекс-метод',
+        key: routerNameEnum.Simplex,
+        to: Simplex,
+      },
+      [routerNameEnum.MethodOfPotentials]: {
+        icon: 'car',
+        title: 'Метод потенциалов',
+        key: routerNameEnum.MethodOfPotentials,
+        to: MethodOfPotentials,
+      },
+      [routerNameEnum.NetworkPlanning]: {
+        icon: 'graph',
+        title: 'Сетевое планирование',
+        key: routerNameEnum.NetworkPlanning,
+        to: NetworkPlanning,
+      },
+      [routerNameEnum.RedistributionOfFunds]: {
+        icon: 'time',
+        title: 'Перераспределение средств',
+        key: routerNameEnum.RedistributionOfFunds,
+        to: RedistributionOfFunds,
+      },
+      [routerNameEnum.InvestmentOfFunds]: {
+        icon: 'database',
+        title: 'Вложение средств',
+        key: routerNameEnum.InvestmentOfFunds,
+        to: InvestmentOfFunds,
+      },
+      *[Symbol.iterator]() {
+        yield this[routerNameEnum.Home];
+        yield this[routerNameEnum.GeometricMethod];
+        yield this[routerNameEnum.Simplex];
+        yield this[routerNameEnum.MethodOfPotentials];
+        yield this[routerNameEnum.NetworkPlanning];
+        yield this[routerNameEnum.RedistributionOfFunds];
+        yield this[routerNameEnum.InvestmentOfFunds];
+      },
+    };
   }
 
   @ProvideReactive('changePage')
