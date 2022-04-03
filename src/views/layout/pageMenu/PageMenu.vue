@@ -1,12 +1,14 @@
 <template>
   <section class="page-menu" :class="pageMenuClasses">
     <nav class="page-menu__nav nav">
-      <button class="nav__arrow" @click="arrowClick"> > </button>
+      <button class="nav__arrow" @click="arrowClick">
+        <span class="arrow-icon"></span>
+      </button>
       <ul class="nav__list">
         <li v-for="item in menuList" :key="item.key" class="nav__item">
           <div class="nav__link" :class="item.isActive" @click="changePage(item.key)">
             <span>{{ item.title }}</span>
-            <EmmmIcon icon="question" class="nav__icon" />
+            <EmmmIcon :icon="item.icon" :size="32" class="nav__icon" />
           </div>
         </li>
       </ul>
@@ -125,9 +127,37 @@ export default class PageMenu extends Vue {
   }
 
   &__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     min-width: 30px;
     min-height: 30px;
     fill: var(--dark-blue-color);
+  }
+}
+
+.arrow-icon {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  left: 4px;
+
+  &:after {
+    content: '';
+    height: 10px;
+    width: 2px;
+    transform-origin: 50% top;
+    transform: rotate(40deg);
+    background-color: black;
+  }
+
+  &:before {
+    content: '';
+    height: 10px;
+    width: 2px;
+    transform-origin: 50% bottom;
+    transform: rotate(-40deg);
+    background-color: black;
   }
 }
 </style>

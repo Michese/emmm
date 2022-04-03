@@ -2,6 +2,7 @@ import { Component } from 'vue';
 import { routerNameEnum } from '@/enums';
 
 type tMenuItem = {
+  icon: string;
   title: string;
   to: Component;
   key: keyof typeof routerNameEnum;
