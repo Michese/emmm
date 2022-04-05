@@ -9,7 +9,7 @@
 
     <span class="initial__task-top">
       <span class="initial__title">Условие</span>
-      <a href="#" target="_blank" download class="initial__question question" tabindex="-1">
+      <a href="#" target="_blank" download class="initial__question question">
         <emmm-icon class="question__icon" icon="question" :size="40" />
       </a>
     </span>
@@ -185,20 +185,6 @@ export default class Initial extends Vue {
   &__apply-btn {
     display: flex;
     justify-content: flex-end;
-  }
-}
-
-.question {
-  display: flex;
-  align-items: center;
-
-  &__icon {
-    fill: var(--dark-blue-color);
-    transition: transform linear 0.05s;
-
-    &:hover {
-      transform: scale3d(1.2, 1.2, 1.2);
-    }
   }
 }
 </style>

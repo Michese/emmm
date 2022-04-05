@@ -3,7 +3,14 @@
     <section class="geometric-method">
       <span class="geometric-method__top">
         <h1 class="geometric-method__title">Геометрический метод</h1>
-        <a href="#" target="_blank" download class="geometric-method__exclamation-mark exclamation-mark">
+        <a
+          href="#"
+          target="_blank"
+          download
+          class="geometric-method__exclamation-mark exclamation-mark"
+          ref="mainIcon"
+          @keydown.shift.tab.prevent="() => $refs.clearButton.focus()"
+        >
           <emmm-icon class="exclamation-mark__icon" icon="exclamationMark" :size="40" />
         </a>
       </span>
@@ -62,7 +69,9 @@
   <a href="#footer" ref="linkFooter" tabindex="-1" />
   <footer v-if="true" class="geometric-method__footer" id="footer">
     <emmm-button :background="'blue'" @click="saveFile">Сохранить</emmm-button>
-    <emmm-button :background="`orange`" @click="fullReset">Очистить</emmm-button>
+    <emmm-button :background="`orange`" @click="fullReset" @keydown.tab.exact.prevent="() => $refs.mainIcon.focus()" ref="clearButton"
+      >Очистить</emmm-button
+    >
   </footer>
 </template>
 
@@ -105,6 +114,8 @@ export default class GeometricMethod extends Vue {
     saveFileModal: { showModal: (json: string) => void };
     graphic: { maxValue: number; pointsOfArea: TPoint[]; endX: number; allLines: TLine[] };
     linkFooter: { click: () => void };
+    clearButton: HTMLButtonElement;
+    mainIcon: HTMLLinkElement;
   };
 
   geometricMethod: tGeometricMethod | null = null;
@@ -477,20 +488,6 @@ export default class GeometricMethod extends Vue {
     bottom: 0;
     padding: 10px 30px;
     background-color: var(--white-color);
-  }
-}
-
-.exclamation-mark {
-  display: flex;
-  align-items: center;
-
-  &__icon {
-    fill: var(--dark-blue-color);
-    transition: transform linear 0.05s;
-
-    &:hover {
-      transform: scale3d(1.2, 1.2, 1.2);
-    }
   }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <span class="emmm-radio">
-    <label :for="id" class="emmm-radio__label">
-      <input type="radio" :name="name" :id="id" :value="value" v-model="curValue" :disabled="disabled" class="emmm-radio__body" />
+    <label :for="id" class="emmm-radio__label" @focus.prevent="() => $refs.input.focus()">
+      <input type="radio" :name="name" :id="id" :value="value" v-model="curValue" :disabled="disabled" class="emmm-radio__body" ref="input" />
       <span class="emmm-radio__circle" />
       {{ label }}
     </label>
@@ -17,6 +17,10 @@ import { Prop, Watch } from 'vue-property-decorator';
   emits: ['change'],
 })
 export default class EmmmRadio extends Vue {
+  declare $refs: {
+    input: HTMLInputElement;
+  };
+
   @Prop({
     type: String,
     required: true,
@@ -81,10 +85,15 @@ export default class EmmmRadio extends Vue {
   }
 
   &__body {
-    display: none;
+    width: 0;
+    height: 0;
   }
 
   &__label:hover > &__circle {
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+  }
+
+  &__body:focus-visible + &__circle {
     box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
   }
 

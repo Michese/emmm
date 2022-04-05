@@ -1,5 +1,5 @@
 <template>
-  <button class="emmm-button" :style="buttonStyles" type="button" :disabled="disabled"><slot></slot></button>
+  <button class="emmm-button" :style="buttonStyles" type="button" :disabled="disabled" ref="customButton"><slot></slot></button>
 </template>
 
 <script lang="ts">
@@ -11,6 +11,10 @@ import { colorEnum } from '@/components';
   name: 'EmmmButton',
 })
 export default class EmmmButton extends Vue {
+  declare $refs: {
+    customButton: HTMLButtonElement;
+  };
+
   @Prop({
     type: String,
     required: false,
@@ -29,6 +33,10 @@ export default class EmmmButton extends Vue {
     return {
       backgroundColor: `var(--${this.background}-color)`,
     };
+  }
+
+  focus(): void {
+    this.$refs.customButton.focus();
   }
 }
 </script>

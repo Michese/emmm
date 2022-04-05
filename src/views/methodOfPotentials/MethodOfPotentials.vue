@@ -2,7 +2,14 @@
   <section class="method-of-potentials">
     <span class="method-of-potentials__top">
       <h1 class="method-of-potentials__title">Метод потенциалов</h1>
-      <a href="#" target="_blank" download class="method-of-potentials__exclamation-mark exclamation-mark">
+      <a
+        href="#"
+        target="_blank"
+        download
+        class="method-of-potentials__exclamation-mark exclamation-mark"
+        ref="mainIcon"
+        @keydown.shift.tab.prevent="() => $refs.clearButton.focus()"
+      >
         <emmm-icon class="exclamation-mark__icon" icon="exclamationMark" :size="40" />
       </a>
     </span>
@@ -43,7 +50,9 @@
     <a href="#footer" ref="linkFooter" tabindex="-1" />
     <footer v-if="true" class="method-of-potentials__footer" id="footer">
       <emmm-button :background="'blue'" @click="saveFile">Сохранить</emmm-button>
-      <emmm-button :background="`orange`" @click="fullReset">Очистить</emmm-button>
+      <emmm-button :background="`orange`" @click="fullReset" @keydown.tab.exact.prevent="() => $refs.mainIcon.focus()" ref="clearButton"
+        >Очистить</emmm-button
+      >
     </footer>
     <emmm-save-file-modal ref="saveFileModal" />
   </section>
@@ -73,6 +82,8 @@ export default class MethodOfPotentials extends Vue {
   declare $refs: {
     saveFileModal: { showModal: (json: string) => void };
     linkFooter: { click: () => void };
+    clearButton: HTMLButtonElement;
+    mainIcon: HTMLLinkElement;
   };
 
   methodOfPotentials: tMethodOfPotentials | null = null;

@@ -19,10 +19,10 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import { InjectReactive, Watch } from 'vue-property-decorator';
-import { Component } from 'vue';
 import { tMenuItem, tMenuItems } from '@/types';
 import { routerNameEnum } from '@/enums';
 import { EmmmIcon } from '@/components';
+
 @Options({
   name: 'PageMenu',
   components: { EmmmIcon },
@@ -47,6 +47,16 @@ export default class PageMenu extends Vue {
     return { 'page-menu_active': this.isActiveMenu };
   }
 
+  onKeyboardHandler(event: KeyboardEvent): void {
+    if (event.ctrlKey && event.shiftKey) {
+      event.preventDefault();
+      const index = this.menuList.findIndex(item => item.key === this.activePage)!;
+      if (index >= this.menuList.length - 1) this.changePage(this.menuList[0].key);
+      else this.changePage(this.menuList[index + 1].key);
+      event.stopPropagation();
+    }
+  }
+
   arrowClick(): void {
     this.isActiveMenu = !this.isActiveMenu;
   }
@@ -58,8 +68,16 @@ export default class PageMenu extends Vue {
     }
   }
 
+  mounted(): void {
+    window.addEventListener('keydown', this.onKeyboardHandler);
+  }
+
+  unmounted(): void {
+    window.removeEventListener('keydown', this.onKeyboardHandler);
+  }
+
   @InjectReactive() menuItems!: tMenuItems;
-  @InjectReactive() changePage!: (component: Component) => void;
+  @InjectReactive() changePage!: (component: keyof typeof routerNameEnum) => void;
   @InjectReactive() activePage!: routerNameEnum;
 }
 </script>

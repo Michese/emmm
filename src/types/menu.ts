@@ -6,7 +6,9 @@ type tMenuItem = {
   title: string;
   to: Component;
   key: keyof typeof routerNameEnum;
-  active?: boolean;
+  isActive?: {
+    active: boolean;
+  };
 };
 
 type tMenuItems = {

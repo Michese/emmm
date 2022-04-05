@@ -1,0 +1,30 @@
+.question {
+  display: flex;
+  align-items: center;
+
+  &:hover,
+  &:focus-visible {
+    transform: scale3d(1.2, 1.2, 1.2);
+  }
+
+  &__icon {
+    fill: var(--dark-blue-color);
+    transition: transform linear 0.05s;
+  }
+}
+
+.exclamation-mark {
+  display: flex;
+  align-items: center;
+
+
+  &:hover,
+  &:focus-visible {
+    transform: scale3d(1.2, 1.2, 1.2);
+  }
+
+  &__icon {
+    fill: var(--dark-blue-color);
+    transition: transform linear 0.05s;
+  }
+}

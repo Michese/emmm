@@ -5,7 +5,7 @@
       <span class="emmm-error-modal__message">{{ message }}</span>
       <span class="emmm-error-modal__message">Попробуйте еще раз!</span>
 
-      <emmm-button :background="'orange'" @click="closeModal">Закрыть</emmm-button>
+      <emmm-button :background="'orange'" @click="closeModal" @keydown.tab.prevent @keydown.shift.tab.prevent ref="closeButton">Закрыть</emmm-button>
     </section>
   </emmm-modal>
 </template>
@@ -21,13 +21,15 @@ import { EmmmButton, EmmmIcon, EmmmModal } from '@/components';
 export default class EmmmErrorModal extends Vue {
   declare $refs: {
     modal: { showModal: () => void; closeModal: () => void };
+    closeButton: HTMLButtonElement;
   };
 
   message = '';
 
-  showModal(message: string): void {
+  async showModal(message: string): Promise<void> {
     this.message = message;
-    this.$refs.modal.showModal();
+    await this.$refs.modal.showModal();
+    this.$refs.closeButton.focus();
   }
 
   closeModal(): void {

@@ -89,7 +89,8 @@ export default class EmmmUpload extends Vue {
   position: relative;
 
   &__body {
-    display: none;
+    width: 0;
+    height: 0;
   }
 
   &__inner {
@@ -120,6 +121,12 @@ export default class EmmmUpload extends Vue {
       color: var(--light-green-color);
       box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
     }
+  }
+
+  &__body:focus-visible + &__inner {
+    background-color: var(--blue-color);
+    color: var(--light-green-color);
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
   }
 
   &__icon {

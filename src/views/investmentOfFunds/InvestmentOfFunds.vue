@@ -2,7 +2,14 @@
   <section class="investment-of-funds">
     <span class="investment-of-funds__top">
       <h1 class="investment-of-funds__title">Вложение средств</h1>
-      <a href="#" target="_blank" download class="investment-of-funds__exclamation-mark exclamation-mark">
+      <a
+        href="#"
+        target="_blank"
+        download
+        class="investment-of-funds__exclamation-mark exclamation-mark"
+        ref="mainIcon"
+        @keydown.shift.tab.prevent="() => $refs.clearButton.focus()"
+      >
         <emmm-icon class="exclamation-mark__icon" icon="exclamationMark" :size="40" />
       </a>
     </span>
@@ -69,7 +76,9 @@
   <a href="#footer" ref="linkFooter" tabindex="-1" />
   <footer class="investment-of-funds__footer" id="footer">
     <emmm-button :background="'blue'" @click="saveFile">Сохранить</emmm-button>
-    <emmm-button :background="`orange`" @click="fullReset">Очистить</emmm-button>
+    <emmm-button :background="`orange`" @click="fullReset" @keydown.tab.exact.prevent="() => $refs.mainIcon.focus()" ref="clearButton"
+      >Очистить</emmm-button
+    >
   </footer>
 </template>
 
@@ -105,6 +114,8 @@ export default class InvestmentOfFunds extends Vue {
   declare $refs: {
     saveFileModal: { showModal: (json: string) => void };
     linkFooter: { click: () => void };
+    clearButton: HTMLButtonElement;
+    mainIcon: HTMLLinkElement;
   };
 
   investmentOfFunds: tInvestmentOfFunds | null = null;
@@ -693,13 +704,14 @@ export default class InvestmentOfFunds extends Vue {
   display: flex;
   align-items: center;
 
+  &:hover,
+  &:focus-visible {
+    transform: scale3d(1.2, 1.2, 1.2);
+  }
+
   &__icon {
     fill: var(--dark-blue-color);
     transition: transform linear 0.05s;
-
-    &:hover {
-      transform: scale3d(1.2, 1.2, 1.2);
-    }
   }
 }
 </style>

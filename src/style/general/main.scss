@@ -6,6 +6,7 @@
 
 a {
   text-decoration: none;
+  outline: none;
   color: var(--black-color);
 }
 
@@ -43,4 +44,10 @@ span {
   transition: max-width 0.3s linear;
   max-width: var(--container-width);
   margin: 0 auto;
+}
+
+.no-visible-link {
+  width: 0;
+  height: 0;
+  //opacity: 0;
 }

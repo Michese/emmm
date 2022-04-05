@@ -2,7 +2,14 @@
   <section class="network-planning">
     <span class="network-planning__top">
       <h1 class="network-planning__title">Сетевое планирование</h1>
-      <a href="#" target="_blank" download class="network-planning__exclamation-mark exclamation-mark">
+      <a
+        href="#"
+        target="_blank"
+        download
+        class="network-planning__exclamation-mark exclamation-mark"
+        ref="mainIcon"
+        @keydown.shift.tab.prevent="() => $refs.clearButton.focus()"
+      >
         <emmm-icon class="exclamation-mark__icon" icon="exclamationMark" :size="40" />
       </a>
     </span>
@@ -64,7 +71,9 @@
   <a href="#footer" ref="linkFooter" tabindex="-1" />
   <footer v-if="true" class="network-planning__footer" id="footer">
     <emmm-button :background="'blue'" @click="saveFile">Сохранить</emmm-button>
-    <emmm-button :background="`orange`" @click="fullReset">Очистить</emmm-button>
+    <emmm-button :background="`orange`" @click="fullReset" @keydown.tab.exact.prevent="() => $refs.mainIcon.focus()" ref="clearButton"
+      >Очистить</emmm-button
+    >
   </footer>
 </template>
 
@@ -98,6 +107,8 @@ export default class NetworkPlanning extends Vue {
   declare $refs: {
     saveFileModal: { showModal: (json: string) => void };
     linkFooter: { click: () => void };
+    clearButton: HTMLButtonElement;
+    mainIcon: HTMLLinkElement;
   };
 
   networkPlanning: tNetworkPlanning | null = null;

@@ -118,18 +118,4 @@ export default class Answer extends Vue {
     margin-right: 20px;
   }
 }
-
-.question {
-  display: flex;
-  align-items: center;
-
-  &__icon {
-    fill: var(--dark-blue-color);
-    transition: transform linear 0.05s;
-
-    &:hover {
-      transform: scale3d(1.2, 1.2, 1.2);
-    }
-  }
-}
 </style>

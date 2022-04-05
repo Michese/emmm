@@ -1,5 +1,5 @@
 <template>
-  <input :type="type" class="emmm-number-input" :placeholder="placeholder" :disabled="disabled" />
+  <input :type="type" class="emmm-number-input" :placeholder="placeholder" :disabled="disabled" ref="customInput" />
 </template>
 
 <script lang="ts">
@@ -15,6 +15,10 @@ enum typeEnum {
   name: 'EmmmInput',
 })
 export default class EmmmNumberInput extends Vue {
+  declare $refs: {
+    customInput: HTMLInputElement;
+  };
+
   @Prop({
     type: String,
     required: false,
@@ -35,6 +39,10 @@ export default class EmmmNumberInput extends Vue {
     default: () => false,
   })
   disabled!: boolean;
+
+  focus(): void {
+    this.$refs.customInput.focus();
+  }
 }
 </script>
 

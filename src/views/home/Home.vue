@@ -5,11 +5,23 @@
         <img class="main-image__body" :src="mainImageSrc" alt="main image" />
       </div>
       <h1 class="home__title">Обучающие программы</h1>
-      <p class="home__description">На сайте представлены программы для решения задач в рамках курса “Экономико-математические методы и модели”</p>
+      <p class="home__description"
+        >На сайте представлены программы для решения задач в рамках курса <br />
+        “Экономико-математические методы и модели”</p
+      >
+      <!--      <input type="radio" class="no-visible-link" @focus.prevent="() => $refs.list.focus()" />-->
       <ul class="home__list">
-        <li v-for="item in homeItems" :key="item.title" class="home__item">
-          <a :href="item.download" target="_blank" download class="home__link">
-            <emmm-icon icon="exclamationMark" :size="40" class="home__emmm-icon" />
+        <li v-for="(item, index) in homeItems" :key="item.title" class="home__item">
+          <a
+            :href="item.download"
+            target="_blank"
+            download
+            class="home__link exclamation-mark"
+            @keydown.shift.tab.exact="$event => (index === 0 ? firstFocusEvent($event) : undefined)"
+            @keydown.tab.exact="$event => (index === homeItems.length - 1 ? lastFocusEvent($event) : undefined)"
+            :ref="`listElement_${index}`"
+          >
+            <emmm-icon icon="exclamationMark" :size="40" class="exclamation-mark__icon" />
           </a>
           <span class="home__text">{{ item.title }}</span>
         </li>
@@ -41,6 +53,10 @@ type tHomeItem = {
   },
 })
 export default class Home extends Vue {
+  declare $refs: {
+    [key: string]: HTMLLinkElement;
+  };
+
   get mainImageSrc(): string {
     return mainImage;
   }
@@ -58,6 +74,16 @@ export default class Home extends Vue {
 
   get authors(): string[] {
     return ['Куликов Вадим', 'Зубкова Надежда'];
+  }
+
+  firstFocusEvent(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.$refs[`listElement_${this.homeItems.length - 1}`].focus();
+  }
+
+  lastFocusEvent(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.$refs.listElement_0.focus();
   }
 }
 </script>
@@ -99,15 +125,7 @@ export default class Home extends Vue {
   }
 
   &__link {
-    display: flex;
-    align-content: center;
     margin-right: 20px;
-    fill: var(--dark-blue-color);
-    transition: transform linear 0.05s;
-
-    &:hover {
-      transform: scale3d(1.2, 1.2, 1.2);
-    }
   }
 }
 

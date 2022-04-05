@@ -8,12 +8,14 @@
         v-model="download"
         @input="$event => (download = $event.target.value)"
         class="emmm-save-file-modal__input"
+        @keydown.shift.tab.prevent="focusCloseButton"
+        ref="textInput"
       />
 
       <footer class="emmm-save-file-modal__footer">
         <a :href="href" target="_blank" :download="titleFile" ref="link" tabindex="-1" />
         <emmm-button :disabled="!canSaveFile" :background="'blue'" @click="saveFile"> Сохранить </emmm-button>
-        <emmm-button :background="'orange'" @click="closeModal">Закрыть</emmm-button>
+        <emmm-button :background="'orange'" @click="closeModal" ref="closeButton" @keydown.tab.exact.prevent="focusTextInput">Закрыть</emmm-button>
       </footer>
     </section>
   </emmm-modal>
@@ -33,7 +35,17 @@ export default class EmmmSaveFileModal extends Vue {
   declare $refs: {
     modal: { showModal: () => void; closeModal: () => void };
     link: { click: () => void };
+    closeButton: { focus: () => void };
+    textInput: { focus: () => void };
   };
+
+  focusCloseButton(): void {
+    this.$refs.closeButton.focus();
+  }
+
+  focusTextInput(): void {
+    this.$refs.textInput.focus();
+  }
 
   download = '';
   href = '';
@@ -53,7 +65,8 @@ export default class EmmmSaveFileModal extends Vue {
 
     if (json && file && base64) {
       this.href = base64 as string;
-      this.$refs.modal.showModal();
+      await this.$refs.modal.showModal();
+      this.focusTextInput();
     } else {
       const errorMessage = 'Ошибка при сохранении файла!';
       if (this.openErrorModal) this.openErrorModal(errorMessage);
