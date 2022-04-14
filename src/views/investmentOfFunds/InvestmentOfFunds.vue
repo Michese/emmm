@@ -3,9 +3,9 @@
     <span class="investment-of-funds__top">
       <h1 class="investment-of-funds__title">Вложение средств</h1>
       <a
-        href="#"
+        :href="help"
         target="_blank"
-        download
+        download="Вложение средств"
         class="investment-of-funds__exclamation-mark exclamation-mark"
         ref="mainIcon"
         @keydown.shift.tab.prevent="() => $refs.clearButton.focus()"
@@ -105,6 +105,7 @@ import SimplexTable from '@/views/simplex/simplexTable/SimplexTable.vue';
 import { Fraction } from '@/class';
 import Answer from '@/views/investmentOfFunds/answer/Answer.vue';
 import { abs, checkHashObject, creatorHashJSON } from '@/helper';
+import { help } from './downloads';
 
 @Options({
   name: 'InvestmentOfFunds',
@@ -148,6 +149,10 @@ export default class InvestmentOfFunds extends Vue {
       : this.investmentOfFunds!.simplexTables!.length <= 1
       ? this.simplexTableFirstApply
       : this.simplexTableInitialApply;
+  }
+
+  get help(): string {
+    return help;
   }
 
   initialApply(): void {

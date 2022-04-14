@@ -2,7 +2,7 @@
   <article class="simplex-table">
     <span class="simplex-table__top">
       <span class="simplex-table__title">{{ top.title }}</span>
-      <a v-if="top.href" :href="top.href" target="_blank" download class="simplex-table__question question">
+      <a v-if="top.href" :href="top.href" target="_blank" :download="top.title" class="simplex-table__question question">
         <emmm-icon class="question__icon" icon="question" :size="40" />
       </a>
     </span>
@@ -50,6 +50,12 @@ import { tElement, tSimplexTable } from '@/views/simplex/component';
 import SimplexTableCell from '@/views/simplex/simplexTable/simplexTableCell/SimplexTableCell.vue';
 import { EmmmButton, EmmmIcon } from '@/components';
 import { Fraction } from '@/class';
+import {
+  findingOptimalPlan,
+  findingReferencePlan,
+  findingResolvingElement,
+  initial
+} from "@/views/simplex/simplexTable/downloads";
 
 @Options({
   name: 'SimplexTable',
@@ -90,13 +96,13 @@ export default class SimplexTable extends Vue {
 
   get top(): { title: string; href?: string } {
     if (this.simplexTable.element && this.isCurrentStep && !this.checkContinue) {
-      return { title: 'Нахождение разрешающего элемента', href: '#' };
+      return { title: 'Нахождение разрешающего элемента', href: findingResolvingElement };
     } else if (!this.previousTable) {
-      return { title: 'Начальные условия', href: '#' };
+      return { title: 'Начальные условия', href: initial };
     } else if (this.referencePlanFound) {
-      return { title: 'Нахождение оптимального плана', href: '#' };
+      return { title: 'Нахождение оптимального плана', href: findingOptimalPlan };
     } else {
-      return { title: 'Нахождение опорного плана', href: '#' };
+      return { title: 'Нахождение опорного плана', href: findingReferencePlan };
     }
   }
 

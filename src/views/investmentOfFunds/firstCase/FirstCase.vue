@@ -2,7 +2,7 @@
   <section class="first-case">
     <span class="first-case__top">
       <span class="first-case__title">Проверка I условия</span>
-      <a href="#" target="_blank" download class="first-case__question question">
+      <a :href="firstCaseHelp" target="_blank" download="Проверка I условия" class="first-case__question question">
         <emmm-icon class="question__icon" icon="question" :size="40" />
       </a>
     </span>
@@ -90,6 +90,7 @@ import { Options, Vue } from 'vue-class-component';
 import { EmmmButton, EmmmIcon, EmmmInput, EmmmRadio } from '@/components';
 import { Prop } from 'vue-property-decorator';
 import { tFirstCase } from '@/views/investmentOfFunds/component';
+import firstCaseHelp from './firstCaseHelp';
 
 @Options({
   name: 'FirstCase',
@@ -132,6 +133,10 @@ export default class FirstCase extends Vue {
         value: 'uncomplete',
       },
     ];
+  }
+
+  get firstCaseHelp(): string {
+    return firstCaseHelp;
   }
 
   applyBtnClick(): void {

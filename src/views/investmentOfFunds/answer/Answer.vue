@@ -2,7 +2,7 @@
   <section class="answer">
     <span class="answer__top">
       <span class="answer__title">Ответ</span>
-      <a href="#" target="_blank" download class="answer__question question">
+      <a :href="answerHelp" target="_blank" download="Ответ" class="answer__question question">
         <emmm-icon class="question__icon" icon="question" :size="40" />
       </a>
     </span>
@@ -38,6 +38,7 @@ import { EmmmButton, EmmmIcon, EmmmInput } from '@/components';
 import { Prop } from 'vue-property-decorator';
 import { tAnswer } from '@/views/investmentOfFunds/component';
 import SimplexTableCell from '@/views/simplex/simplexTable/simplexTableCell/SimplexTableCell.vue';
+import answerHelp from './answerHelp';
 
 @Options({
   name: 'Answer',
@@ -67,6 +68,10 @@ export default class Answer extends Vue {
       this.answer.x7.value !== null &&
       this.answer.Lmin.value !== null
     );
+  }
+
+  get answerHelp(): string {
+    return answerHelp;
   }
 
   applyBtnClick(): void {

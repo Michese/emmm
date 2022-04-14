@@ -11,7 +11,7 @@
 
     <span class="initial__top">
       <span class="initial__title">Условие</span>
-      <a href="#" target="_blank" download class="initial__question question">
+      <a :href="initialHelp" target="_blank" download="Условие" class="initial__question question">
         <emmm-icon class="question__icon" icon="question" :size="40" />
       </a>
     </span>
@@ -107,6 +107,7 @@ import { Options, Vue } from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import { tConditions } from '@/views/investmentOfFunds/component';
 import { colorEnum, EmmmButton, EmmmIcon, EmmmInput, EmmmUpload } from '@/components';
+import initialHelp from './initialHelp';
 
 @Options({
   name: 'Initial',
@@ -145,6 +146,10 @@ export default class Initial extends Vue {
       this.conditions.T0 !== null &&
       this.conditions.coefficients.every(coef => coef.t !== null && coef.x !== null && coef.upperBound !== null)
     );
+  }
+
+  get initialHelp(): string {
+    return initialHelp;
   }
 
   manuallyButtonClick(): void {

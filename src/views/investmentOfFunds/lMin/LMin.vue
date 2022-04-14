@@ -2,7 +2,7 @@
   <section class="l-min">
     <span class="l-min__top">
       <span class="l-min__title">Решение задачи линейного программирования</span>
-      <a href="#" target="_blank" download class="l-min__question question">
+      <a :href="lMinHelp" target="_blank" download="Решение задачи линейного программирования" class="l-min__question question">
         <emmm-icon class="question__icon" icon="question" :size="40" />
       </a>
     </span>
@@ -47,6 +47,7 @@ import { Options, Vue } from 'vue-class-component';
 import { EmmmButton, EmmmIcon, EmmmInput } from '@/components';
 import { Prop } from 'vue-property-decorator';
 import { tCoefficient, tLmin } from '@/views/investmentOfFunds/component';
+import lMinHelp from './lMinHelp';
 
 @Options({
   name: 'LMin',
@@ -76,6 +77,10 @@ export default class LMin extends Vue {
 
   get checkLMin(): boolean {
     return this.lMin.result !== null && this.lMin.coefficients.every(coef => coef.x !== null);
+  }
+
+  get lMinHelp(): string {
+    return lMinHelp;
   }
 
   applyBtnClick(): void {

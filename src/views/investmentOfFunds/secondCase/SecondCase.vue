@@ -2,7 +2,7 @@
   <div class="second-case">
     <span class="second-case__top">
       <span class="second-case__title">Проверка II условия</span>
-      <a href="#" target="_blank" download class="second-case__question question">
+      <a :href="secondCaseHelp" target="_blank" download="Проверка II условия" class="second-case__question question">
         <emmm-icon class="question__icon" icon="question" :size="40" />
       </a>
     </span>
@@ -105,6 +105,7 @@ import { Options, Vue } from 'vue-class-component';
 import { EmmmButton, EmmmIcon, EmmmInput, EmmmRadio } from '@/components';
 import { Prop } from 'vue-property-decorator';
 import { tSecondCase } from '@/views/investmentOfFunds/component';
+import secondCaseHelp from './secondCaseHelp';
 
 @Options({
   name: 'SecondCase',
@@ -152,6 +153,10 @@ export default class SecondCase extends Vue {
         value: 'uncomplete',
       },
     ];
+  }
+
+  get secondCaseHelp(): string {
+    return secondCaseHelp;
   }
 
   applyBtnClick(): void {
