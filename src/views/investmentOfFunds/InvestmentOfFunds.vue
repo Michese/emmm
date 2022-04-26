@@ -345,32 +345,22 @@ export default class InvestmentOfFunds extends Vue {
     let rightPart = criticalTime - this.investmentOfFunds!.conditions.T0!,
       resultX = this.investmentOfFunds!.conditions.coefficients.map(coef => coef.t! * coef.x!);
 
-    while (abs(rightPart - Math.round(rightPart)) >= 0.00001 || resultX.some(x => abs(x - Math.round(x)) >= 0.0001)) {
-      rightPart *= 10;
-      resultX = resultX.map(x => x * 10);
-    }
-
-    if (abs(this.investmentOfFunds!.Lmin!.result! - rightPart) >= 0.0001) {
+    const resultCoefficients = this.investmentOfFunds!.Lmin!.coefficients.map((coef, index) => {
+        return resultX[index] / coef.x!;
+      }),
+      rightPartCoefficient = rightPart / this.investmentOfFunds!.Lmin!.result!;
+    if (resultCoefficients.some(coef => coef - rightPartCoefficient > 0.00001)) {
       this.investmentOfFunds!.Lmin!.result = null;
+      this.investmentOfFunds!.Lmin!.coefficients.forEach(coef => {
+        coef.x = null;
+      });
       errorMessage = 'Неравенство составлено неверно!';
     }
-
-    this.investmentOfFunds!.Lmin!.coefficients.forEach((coef, index) => {
-      if (abs(coef.x! - resultX[index]) >= 0.0001) {
-        coef.x = null;
-        errorMessage = 'Неравенство составлено неверно!';
-      }
-    });
 
     if (errorMessage) {
       if (this.openErrorModal) this.openErrorModal(errorMessage);
       this.investmentOfFunds!.countErrors++;
     } else {
-      this.investmentOfFunds!.Lmin!.result = Math.round(this.investmentOfFunds!.Lmin!.result!);
-      this.investmentOfFunds!.Lmin!.coefficients.forEach(coef => {
-        coef.x = Math.round(coef.x!);
-      });
-
       this.investmentOfFunds!.simplexTables = [initialSimplexTableRows(6, 5)];
       this.toDown();
     }

@@ -50,12 +50,7 @@ import { tElement, tSimplexTable } from '@/views/simplex/component';
 import SimplexTableCell from '@/views/simplex/simplexTable/simplexTableCell/SimplexTableCell.vue';
 import { EmmmButton, EmmmIcon } from '@/components';
 import { Fraction } from '@/class';
-import {
-  findingOptimalPlan,
-  findingReferencePlan,
-  findingResolvingElement,
-  initial
-} from "@/views/simplex/simplexTable/downloads";
+import { findingOptimalPlan, findingReferencePlan, findingResolvingElement, initial } from '@/views/simplex/simplexTable/downloads';
 
 @Options({
   name: 'SimplexTable',

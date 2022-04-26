@@ -26,7 +26,7 @@ module.exports = {
           minifyJS: true,
           minifyURLs: false,
           removeAttributeQuotes: true,
-          removeComments: true, // false for Vue SSR to find app placeholder
+          removeComments: true,
           removeEmptyAttributes: true,
           removeOptionalTags: true,
           removeRedundantAttributes: true,
