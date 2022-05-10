@@ -9,10 +9,13 @@
     "experimentalDecorators": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
+    "isolatedModules": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
     "types": [
       "webpack-env"
     ],
@@ -25,7 +28,8 @@
       "esnext",
       "dom",
       "dom.iterable",
-      "scripthost"
+      "scripthost",
+      "ES5",
     ],
     "strictBindCallApply": false,
   },
