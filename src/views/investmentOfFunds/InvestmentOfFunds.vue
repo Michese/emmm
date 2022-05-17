@@ -339,6 +339,9 @@ export default class InvestmentOfFunds extends Vue {
     this.investmentOfFunds!.secondCase!.conditions!.pop();
   }
 
+  /**
+   * Функция проверки корректного решения задачи линейного программирования в программе "Вложение средств"
+   */
   lMinApply(): void {
     let errorMessage = '';
     const criticalTime = this.investmentOfFunds!.conditions.coefficients.reduce((total, coef) => total + coef.t!, 0);
@@ -507,6 +510,9 @@ export default class InvestmentOfFunds extends Vue {
     } else this.checkPlanFounded();
   }
 
+  /**
+   * Функция проверки корректного нахождения разрешающего элемента в программе "Симплекс-метод"
+   */
   simplexTableElementApply(): void {
     let errorMessage = '';
     const simplexTables = this.investmentOfFunds!.simplexTables!,

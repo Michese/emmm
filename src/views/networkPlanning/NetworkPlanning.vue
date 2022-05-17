@@ -239,6 +239,9 @@ export default class NetworkPlanning extends Vue {
     this.networkPlanning!.newWorks = null;
   }
 
+  /**
+   * Функция проверки корректного построения критического пути в новых обозначениях в программе "Сетевое планирование"
+   */
   pathApply(): void {
     let errorMessage = '';
 

@@ -193,6 +193,9 @@ export default class GeometricMethod extends Vue {
     this.geometricMethod!.pointsForLines = null;
   }
 
+  /**
+   * Функция проверки корректного ввода точек для построения вектора
+   */
   buildingVectorApply(): void {
     const {
         pointsForVector,

@@ -322,6 +322,10 @@ export default class RedistributionOfFunds extends Vue {
     this.redistributionOfFunds![numberCase]!.vectorPoints = null;
   }
 
+  /**
+   * Функция проверки корректного положения вектора на графике для двух случаев в программе "Перераспределение средств"
+   * @param numberCase
+   */
   graphicApply(numberCase: 'firstCase' | 'secondCase'): void {
     let errorMessage = '';
 

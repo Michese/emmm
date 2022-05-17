@@ -17,6 +17,7 @@ module.exports = {
     plugins: [
       new HtmlWebpackPlugin({
         vue: true,
+        template: 'public/index.html',
         inlineSource: '.(js|css)$',
         inject: 'body',
         minify: {

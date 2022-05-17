@@ -12,6 +12,12 @@
 <noscript>
   <strong>Приложение не может работать без подключенного JavaScript!</strong>
 </noscript>
-<div id="app"></div>
+<script type="application/javascript">
+  setTimeout(function() {
+    var styleElement = document.createElement('style');
+    styleElement.innerHTML = '#app:empty::after{content:"К сожалению, браузер Internet explorer является устаревшим. Чтобы открыть приложение \'ЭМММ\', перейдите в другой браузер.";}';
+    document.querySelector('body').insertAdjacentElement('afterbegin', styleElement)
+  }, 4000);
+</script>
 </body>
 </html>
